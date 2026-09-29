@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: unisafe
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      # sync: false = set these manually in the Render dashboard, never
+      # commit real secrets to this file or to git
+      - key: SECRET_KEY
+        sync: false
+      - key: OPERATOR_USERNAME
+        sync: false
+      - key: OPERATOR_PASSWORD_HASH
+        sync: false

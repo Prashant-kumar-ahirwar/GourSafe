@@ -1,0 +1,49 @@
+{% extends "auth_base.html" %}
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="login-card">
+  <div class="text-center mb-4">
+    <div class="login-card__icon login-card__icon--danger mx-auto mb-3">
+      <i class="bi bi-person-plus-fill"></i>
+    </div>
+    <h1 class="page-title text-white mb-1">Create Account</h1>
+    <p class="page-subtitle mb-0">Step 1 of 2 — your account</p>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-danger d-flex align-items-center gap-2 py-2" role="alert">
+    <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+    <span class="small">{{ error }}</span>
+  </div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('signup') }}">
+    <div class="mb-3">
+      <label for="name" class="form-label small text-muted">Full Name</label>
+      <input type="text" class="form-control" id="name" name="name" value="{{ name or '' }}" required autofocus />
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label small text-muted">Email</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required />
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label small text-muted">Password</label>
+      <input type="password" class="form-control" id="password" name="password" minlength="8" required />
+      <div class="form-text">At least 8 characters.</div>
+    </div>
+    <div class="mb-4">
+      <label for="confirm_password" class="form-label small text-muted">Confirm Password</label>
+      <input type="password" class="form-control" id="confirm_password" name="confirm_password" minlength="8" required />
+    </div>
+    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">Create Account</button>
+  </form>
+
+  <p class="text-center text-muted small mt-4 mb-0">
+    Already have an account? <a href="{{ url_for('login') }}" class="link-light">Sign in</a>
+  </p>
+  <p class="text-center mt-2 mb-0">
+    <a href="{{ url_for('guest_login') }}" class="text-muted small">Continue as Guest instead</a>
+  </p>
+</div>
+{% endblock %}

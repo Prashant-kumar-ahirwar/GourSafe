@@ -1,0 +1,51 @@
+{% extends "auth_base.html" %}
+{% block title %}Your Profile{% endblock %}
+
+{% block content %}
+<div class="login-card">
+  <div class="text-center mb-4">
+    <div class="login-card__icon login-card__icon--danger mx-auto mb-3">
+      <i class="bi bi-person-lines-fill"></i>
+    </div>
+    <h1 class="page-title text-white mb-1">Almost Done</h1>
+    <p class="page-subtitle mb-0">Step 2 of 2 — your emergency contact</p>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-danger d-flex align-items-center gap-2 py-2" role="alert">
+    <i class="bi bi-exclamation-triangle-fill flex-shrink-0"></i>
+    <span class="small">{{ error }}</span>
+  </div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('profile_setup') }}">
+    <div class="mb-3">
+      <label for="phone" class="form-label small text-muted">Your Phone Number</label>
+      <input type="tel" class="form-control" id="phone" name="phone" required autofocus />
+    </div>
+
+    <hr class="border-secondary my-4" />
+
+    <p class="small text-muted mb-3">
+      <i class="bi bi-people-fill me-1"></i>Who should we contact if you hit SOS?
+    </p>
+    <div class="mb-3">
+      <label for="emergency_contact_name" class="form-label small text-muted">Emergency Contact Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="emergency_contact_name"
+        name="emergency_contact_name"
+        placeholder="e.g. parent, guardian, sibling"
+        required
+      />
+    </div>
+    <div class="mb-4">
+      <label for="emergency_contact_phone" class="form-label small text-muted">Emergency Contact Phone</label>
+      <input type="tel" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone" required />
+    </div>
+
+    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">Finish Setup</button>
+  </form>
+</div>
+{% endblock %}

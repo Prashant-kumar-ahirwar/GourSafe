@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Everything below is one flex column (see .home-fit-screen): the top
+     group (header + quick circles) and the SOS group are pushed to the
+     very top and very bottom of the available screen space — nothing
+     here should ever need the page itself to scroll. -->
+
+<div class="home-fit-screen">
+
+  <!-- ── Top group: header + quick circles ── -->
+  <div>
+    <div class="mb-3">
+      <h1 class="page-title text-danger mb-0">
+        <i class="bi bi-shield-fill-exclamation me-2"></i>GourSafe
+      </h1>
+      <p class="page-subtitle mb-0">Dr. Harisingh Gour Vishwavidyalaya, Sagar</p>
+    </div>
+
+    <!-- ── Quick circles: national numbers + your pinned contacts ── -->
+    <div>
+      <p class="text-muted small mb-1">Quick contact:</p>
+      <div class="quick-circle-row">
+        <a href="tel:112" class="quick-circle">
+          <span class="quick-circle__icon"><i class="bi bi-shield-fill-exclamation"></i></span>
+          <span class="quick-circle__name">All Emergencies</span>
+        </a>
+        <a href="tel:100" class="quick-circle">
+          <span class="quick-circle__icon quick-circle__icon--primary"><i class="bi bi-patch-check-fill"></i></span>
+          <span class="quick-circle__name">Police</span>
+        </a>
+        <a href="tel:108" class="quick-circle">
+          <span class="quick-circle__icon"><i class="bi bi-heart-pulse-fill"></i></span>
+          <span class="quick-circle__name">Ambulance</span>
+        </a>
+        <a href="tel:101" class="quick-circle">
+          <span class="quick-circle__icon quick-circle__icon--warning"><i class="bi bi-fire"></i></span>
+          <span class="quick-circle__name">Fire</span>
+        </a>
+        <a href="tel:1091" class="quick-circle">
+          <span class="quick-circle__icon quick-circle__icon--success"><i class="bi bi-gender-female"></i></span>
+          <span class="quick-circle__name">Women's Helpline</span>
+        </a>
+
+        <!-- Pinned personal contacts (starred on the Contacts page) -->
+        {% for c in pinned_contacts %}
+        <a href="tel:{{ c['phone'] }}" class="quick-circle">
+          <span class="quick-circle__icon quick-circle__icon--info">
+            <i class="bi bi-person-fill"></i>
+          </span>
+          <span class="quick-circle__name">{{ c['name'] }}</span>
+        </a>
+        {% endfor %}
+
+        <!-- Nudge toward pinning when there's nothing personal yet -->
+        {% if current_user and not pinned_contacts %}
+        <a href="{{ url_for('contacts') }}" class="quick-circle">
+          <span class="quick-circle__icon" style="background: var(--color-card-bg-raised); color: var(--color-muted-text); border: 1px dashed var(--color-border);">
+            <i class="bi bi-star"></i>
+          </span>
+          <span class="quick-circle__name">Pin a Contact</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bottom group: SOS button, pushed down for fast thumb reach ── -->
+  <div class="d-flex flex-column align-items-center">
+    <p class="text-white small mb-2 text-center">
+      In immediate danger? Press SOS to share your location.
+    </p>
+
+    <button
+      id="sosBtn"
+      class="sos-btn mb-2"
+      aria-label="Send SOS and share my location"
+      onclick="sendSOS()"
+    >
+      <span class="sos-btn__ring"></span>
+      <span class="sos-btn__inner">
+        <i class="bi bi-exclamation-circle-fill d-block mb-1"></i>
+        <span>SOS</span>
+      </span>
+    </button>
+
+    <!-- Status panel — hidden until SOS is triggered -->
+    <div id="statusPanel" class="w-100 d-none">
+
+      <div id="stateLocating" class="d-none text-center py-2">
+        <div class="spinner-border spinner-border-sm text-danger me-2" role="status" aria-hidden="true"></div>
+        <span class="text-white small">Getting your location…</span>
+      </div>
+
+      <div id="stateSending" class="d-none text-center py-2">
+        <div class="spinner-border spinner-border-sm text-warning me-2" role="status" aria-hidden="true"></div>
+        <span class="text-white small">Sending to security…</span>
+      </div>
+
+      <div id="stateSuccess" class="d-none">
+        <div class="alert alert-success d-flex align-items-start gap-2 py-2 mb-0" role="alert">
+          <i class="bi bi-check-circle-fill flex-shrink-0 mt-1"></i>
+          <div>
+            <strong>Location sent.</strong> Help is on the way.
+            <div class="mt-1 small">
+              <span id="outLat"></span>, <span id="outLon"></span>
+              &nbsp;(±<span id="outAcc"></span> m)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="stateError" class="d-none">
+        <div class="alert alert-danger d-flex align-items-start gap-2 py-2 mb-0" role="alert">
+          <i class="bi bi-x-circle-fill flex-shrink-0 mt-1"></i>
+          <div>
+            <strong>SOS failed.</strong> <span id="errorMsg"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- Note: the navigation tiles (Contacts / Security / Report) that used
+     to live here were removed — they duplicated the bottom nav strip
+     directly below, and removing them was what made room to fit this
+     whole page on one screen with no scrolling. All three are still one
+     tap away via the bottom nav. -->
+{% endblock %}

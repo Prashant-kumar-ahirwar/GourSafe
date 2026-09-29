@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Campus Security{% endblock %}
+
+{% block content %}
+
+<!-- Page title -->
+<div class="mb-4">
+  <h1 class="page-title text-warning">
+    <i class="bi bi-building-lock me-2"></i>Campus Security
+  </h1>
+  <p class="page-subtitle">Know where to go and what to do.</p>
+</div>
+
+<!-- ── Office Location — blue/info accent ── -->
+<div class="info-card mb-3">
+  <div class="info-card__bar info-card__bar--info"></div>
+  <div class="info-card__body">
+    <div class="info-card__heading">
+      <span class="info-card__heading-icon info-card__heading-icon--info">
+        <i class="bi bi-geo-alt-fill"></i>
+      </span>
+      <span class="info-card__heading-text">Security Office</span>
+    </div>
+    <p class="mb-1 text-white fw-semibold">Security Control Room</p>
+    <p class="mb-1 text-muted small">Main Gate, University Road (Gour Nagar)</p>
+    <p class="mb-1 text-muted small">Dr. Harisingh Gour Vishwavidyalaya, Sagar – 470003, M.P.</p>
+    <p class="mb-0 text-muted small">
+      <i class="bi bi-geo-alt me-1"></i>Pathariya Hills, Vindhya Range — approx. 5 km east of Sagar city
+    </p>
+  </div>
+</div>
+
+<!-- ── Campus Fact — neutral/secondary accent ── -->
+<div class="info-card mb-3">
+  <div class="info-card__bar info-card__bar--secondary"></div>
+  <div class="info-card__body">
+    <div class="info-card__heading">
+      <span class="info-card__heading-icon info-card__heading-icon--secondary">
+        <i class="bi bi-map-fill"></i>
+      </span>
+      <span class="info-card__heading-text">About the Campus</span>
+    </div>
+    <p class="mb-1 text-muted small">
+      <i class="bi bi-rulers me-1 text-secondary"></i>
+      Spread across <strong class="text-white">~1,313 acres</strong> on Pathariya Hills (Vindhya Range), the campus is one of the largest in central India. Familiarise yourself with the layout — distances between buildings can be significant.
+    </p>
+    <p class="mb-0 text-muted small">
+      <i class="bi bi-calendar3 me-1 text-secondary"></i>
+      Founded 18 July 1946 · Central University since 15 January 2009.
+    </p>
+  </div>
+</div>
+
+<!-- ── Operating Hours — warning/amber accent ── -->
+<div class="info-card mb-3">
+  <div class="info-card__bar info-card__bar--warning"></div>
+  <div class="info-card__body">
+    <div class="info-card__heading">
+      <span class="info-card__heading-icon info-card__heading-icon--warning">
+        <i class="bi bi-clock-fill"></i>
+      </span>
+      <span class="info-card__heading-text">Operating Hours</span>
+    </div>
+    <table class="table table-dark table-sm table-borderless mb-0">
+      <tbody>
+        <tr>
+          <td class="text-muted ps-0">Main Gate Post</td>
+          <td class="text-end fw-semibold">24 / 7</td>
+        </tr>
+        <tr>
+          <td class="text-muted ps-0">Security Office</td>
+          <td class="text-end fw-semibold">7 AM – 10 PM</td>
+        </tr>
+        <tr>
+          <td class="text-muted ps-0">Night Patrol</td>
+          <td class="text-end fw-semibold">10 PM – 6 AM</td>
+        </tr>
+        <tr>
+          <td class="text-muted ps-0">Emergency Line</td>
+          <td class="text-end fw-semibold text-danger">24 / 7</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Safety Guidelines — danger accent, grouped for scannability ── -->
+<div class="info-card mb-3">
+  <div class="info-card__bar info-card__bar--danger"></div>
+  <div class="info-card__body">
+    <div class="info-card__heading">
+      <span class="info-card__heading-icon info-card__heading-icon--danger">
+        <i class="bi bi-journal-check"></i>
+      </span>
+      <span class="info-card__heading-text">Safety Guidelines</span>
+    </div>
+
+    <ul class="list-unstyled mb-0 safety-list">
+
+      <!-- Group 1: Critical — highlighted, shown first -->
+      <li class="safety-list__group-label">⚡ Critical</li>
+      <li class="tip--critical">
+        <i class="bi bi-exclamation-circle-fill text-danger me-2"></i>
+        <strong>Do not confront</strong> suspicious persons — report them to security immediately.
+      </li>
+      <li class="tip--critical">
+        <i class="bi bi-exclamation-circle-fill text-danger me-2"></i>
+        Use the <strong>SOS button</strong> on the home page if you cannot speak safely on a call.
+      </li>
+
+      <!-- Group 2: Everyday safety -->
+      <li class="safety-list__group-label">Daily habits</li>
+      <li>
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+        Always carry your student ID on campus.
+      </li>
+      <li>
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+        Keep your hostel room locked at all times, even when inside.
+      </li>
+      <li>
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+        Do not prop open access-controlled doors for strangers.
+      </li>
+      <li>
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+        Walk in well-lit areas at night; use the campus shuttle when available.
+      </li>
+
+      <!-- Group 3: Emergency procedures -->
+      <li class="safety-list__group-label">In an emergency</li>
+      <li>
+        <i class="bi bi-fire text-warning me-2"></i>
+        Fire: alert others, evacuate immediately, then call <strong>101</strong> (Fire Service) or <strong>112</strong>.
+      </li>
+      <li>
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+        Memorise at least one emergency number — don't rely solely on this app.
+      </li>
+
+    </ul>
+  </div>
+</div>
+
+<!-- ── Emergency Muster Points — success/green accent ── -->
+<div class="info-card mb-4">
+  <div class="info-card__bar info-card__bar--success"></div>
+  <div class="info-card__body">
+    <div class="info-card__heading">
+      <span class="info-card__heading-icon info-card__heading-icon--success">
+        <i class="bi bi-people-fill"></i>
+      </span>
+      <span class="info-card__heading-text">Emergency Muster Points</span>
+    </div>
+    <p class="text-muted small mb-1">If evacuating — go to your nearest open point:</p>
+    <p class="text-warning small mb-2" style="font-size:0.72rem;">
+      <i class="bi bi-exclamation-triangle-fill me-1"></i>
+      These are suggested assembly points, not officially confirmed ones. Verify against the university's actual evacuation plan if one exists.
+    </p>
+    <div class="row g-2">
+      <div class="col-6">
+        <div class="muster-point p-2 rounded border border-secondary text-center">
+          <i class="bi bi-flag-fill text-success d-block mb-1"></i>
+          <span class="small">Central Library Forecourt</span>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="muster-point p-2 rounded border border-secondary text-center">
+          <i class="bi bi-flag-fill text-success d-block mb-1"></i>
+          <span class="small">University Stadium</span>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="muster-point p-2 rounded border border-secondary text-center">
+          <i class="bi bi-flag-fill text-success d-block mb-1"></i>
+          <span class="small">Admin Block Quadrangle</span>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="muster-point p-2 rounded border border-secondary text-center">
+          <i class="bi bi-flag-fill text-success d-block mb-1"></i>
+          <span class="small">Guest House Lawn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTAs -->
+<div class="d-grid gap-2">
+  <a href="{{ url_for('index') }}" class="btn btn-danger btn-lg fw-bold">
+    <i class="bi bi-geo-alt-fill me-2"></i>Send SOS — Share My Location
+  </a>
+  <a href="{{ url_for('contacts') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-telephone-fill me-2"></i>View Emergency Contacts
+  </a>
+</div>
+
+{% endblock %}

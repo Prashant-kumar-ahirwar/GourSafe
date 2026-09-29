@@ -1,0 +1,171 @@
+{% extends "operator_base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Page title + auto-refresh toggle -->
+<div class="mb-4 d-flex align-items-start justify-content-between flex-wrap gap-2">
+  <div>
+    <h1 class="page-title text-white">
+      <i class="bi bi-speedometer2 me-2 text-info"></i>Dashboard
+    </h1>
+    <p class="page-subtitle">Live incident reports and SOS alerts.</p>
+  </div>
+
+  <label class="auto-refresh-toggle" title="Reload this page automatically">
+    <input type="checkbox" id="autoRefreshToggle" checked />
+    <span><i class="bi bi-arrow-repeat me-1"></i>Auto-refresh (<span id="refreshCountdown">15</span>s)</span>
+  </label>
+</div>
+
+<!-- ── Summary stat cards ── -->
+<div class="row g-2 mb-4">
+  <div class="col-6">
+    <div class="stat-card stat-card--danger">
+      <div class="stat-card__value">{{ open_alerts }}</div>
+      <div class="stat-card__label"><i class="bi bi-geo-alt-fill me-1"></i>Active SOS</div>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="stat-card stat-card--warning">
+      <div class="stat-card__value">{{ new_reports }}</div>
+      <div class="stat-card__label"><i class="bi bi-flag-fill me-1"></i>New Reports</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SOS Alerts section ── -->
+<div class="admin-section-header admin-section-header--danger mb-3">
+  <i class="bi bi-geo-alt-fill text-danger"></i>
+  <span class="admin-section-header__title text-danger">SOS Alerts</span>
+  <span class="badge bg-danger ms-auto">{{ sos_alerts | length }}</span>
+</div>
+
+{% if sos_alerts %}
+<div class="table-responsive mb-5">
+  <table class="table table-dark table-hover table-sm align-middle">
+    <thead>
+      <tr class="text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;">
+        <th scope="col">#</th>
+        <th scope="col">Time (UTC)</th>
+        <th scope="col">Coordinates</th>
+        <th scope="col">Accuracy</th>
+        <th scope="col">Map</th>
+        <th scope="col">Status</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in sos_alerts %}
+      <tr class="{{ 'table-alert-active' if p['status'] == 'active' }}">
+        <td class="text-muted">{{ p['id'] }}</td>
+        <td class="text-nowrap small">{{ p['created_at'] }}</td>
+        <td class="small">{{ "%.5f" | format(p['latitude']) }}, {{ "%.5f" | format(p['longitude']) }}</td>
+        <td class="small">{{ "%.0f" | format(p['accuracy']) }}m</td>
+        <td>
+          <a
+            href="https://www.openstreetmap.org/?mlat={{ p['latitude'] }}&mlon={{ p['longitude'] }}&zoom=17"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline-info btn-sm py-0"
+            aria-label="View on map"
+          >
+            <i class="bi bi-map"></i>
+          </a>
+        </td>
+        <td>
+          {% if p['status'] == 'active' %}
+            <span class="badge status-badge status-badge--active">Active</span>
+          {% else %}
+            <span class="badge status-badge status-badge--handled">Handled</span>
+          {% endif %}
+        </td>
+        <td class="text-end">
+          <form method="POST" action="{{ url_for('update_alert_status', alert_id=p['id']) }}" class="d-inline">
+            {% if p['status'] == 'active' %}
+              <input type="hidden" name="status" value="handled" />
+              <button type="submit" class="btn btn-sm btn-outline-success py-0">Mark handled</button>
+            {% else %}
+              <input type="hidden" name="status" value="active" />
+              <button type="submit" class="btn btn-sm btn-outline-secondary py-0">Reopen</button>
+            {% endif %}
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-secondary mb-5 d-flex align-items-center gap-2" role="alert">
+  <i class="bi bi-inbox flex-shrink-0"></i>
+  <span>No SOS alerts yet.</span>
+</div>
+{% endif %}
+
+<!-- ── Incident Reports section ── -->
+<div class="admin-section-header admin-section-header--warning mb-3">
+  <i class="bi bi-flag-fill text-warning"></i>
+  <span class="admin-section-header__title text-warning">Incident Reports</span>
+  <span class="badge bg-warning text-dark ms-auto">{{ reports | length }}</span>
+</div>
+
+{% if reports %}
+<div class="table-responsive">
+  <table class="table table-dark table-hover table-sm align-middle">
+    <thead>
+      <tr class="text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;">
+        <th scope="col">#</th>
+        <th scope="col">Time (UTC)</th>
+        <th scope="col">Category</th>
+        <th scope="col">Reporter</th>
+        <th scope="col">Description</th>
+        <th scope="col">Status</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reports %}
+      <tr>
+        <td class="text-muted">{{ r['id'] }}</td>
+        <td class="text-nowrap small">{{ r['created_at'] }}</td>
+        <td><span class="badge bg-warning text-dark">{{ r['category'] }}</span></td>
+        <td class="small">
+          {% if r['anonymous'] %}
+            <span class="text-muted fst-italic">Anonymous</span>
+          {% else %}
+            {{ r['name'] or '—' }}
+          {% endif %}
+        </td>
+        <td class="small report-desc">{{ r['description'] }}</td>
+        <td>
+          <span class="badge status-badge status-badge--{{ r['status'] }}">
+            {{ r['status'] | capitalize }}
+          </span>
+        </td>
+        <td class="text-end">
+          <form method="POST" action="{{ url_for('update_report_status', report_id=r['id']) }}" class="d-flex gap-1 justify-content-end">
+            <select name="status" class="form-select form-select-sm status-select" onchange="this.form.requestSubmit()">
+              <option value="new" {{ 'selected' if r['status'] == 'new' }}>New</option>
+              <option value="acknowledged" {{ 'selected' if r['status'] == 'acknowledged' }}>Acknowledged</option>
+              <option value="resolved" {{ 'selected' if r['status'] == 'resolved' }}>Resolved</option>
+            </select>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-secondary d-flex align-items-center gap-2" role="alert">
+  <i class="bi bi-inbox flex-shrink-0"></i>
+  <span>No incident reports yet.</span>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/operator.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,19 @@
+# SQLite database (auto-created at runtime)
+database.db
+
+# Environment variables (real secrets — .env.example is the template that DOES get committed)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db

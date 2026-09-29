@@ -1,0 +1,840 @@
+/* ============================================================
+   GourSafe — custom stylesheet
+   Mobile-first, dark theme, supplements Bootstrap 5
+   ============================================================ */
+
+/* ── Global ── */
+:root {
+  --color-danger:  #dc3545;
+  --color-warning: #ffc107;
+  --color-success: #198754;
+  --color-info:    #0dcaf0;
+  --color-primary: #0d6efd;
+  --color-dark-bg: #121212;
+  --color-card-bg: #1e1e1e;
+  --color-card-bg-raised: #252525;
+  --color-border:  #2e2e2e;
+  --bottom-nav-h:  64px;
+  /* readable body text on dark cards — meets WCAG AA at normal size */
+  --color-body-text: #c9d1d9;
+  --color-muted-text: #8b949e;
+  /* headings / high-emphasis text and default body copy — these are
+     the ones that actually need to flip in light mode. Text sitting on
+     a saturated colored badge (SOS button, contact icons) is
+     deliberately NOT tied to this variable, since white-on-red should
+     stay white regardless of theme. */
+  --color-heading-text: #fff;
+  --color-text-primary: #e0e0e0;
+  /* fixed, known navbar height so the home page can calculate exactly
+     how much space is left for its "fits one screen" layout */
+  --navbar-h: 62px;
+}
+
+/* ── Light theme ──────────────────────────────────────────────
+   Toggled via the Theme option in the profile menu (top-right), which
+   sets data-bs-theme="light" on <html> — the same attribute Bootstrap
+   5.3 itself uses, so bg-dark/text-white/border-secondary/text-bg-dark
+   utility classes flip automatically with zero extra work. This block
+   only needs to cover OUR OWN custom variables on top of that. */
+html[data-bs-theme="light"] {
+  --color-dark-bg: #f4f5f7;
+  --color-card-bg: #ffffff;
+  --color-card-bg-raised: #eceef1;
+  --color-border: #dde1e6;
+  --color-body-text: #3a3f44;
+  --color-muted-text: #5c6570;
+  --color-heading-text: #1a1a1a;
+  --color-text-primary: #1a1a1a;
+}
+
+
+html {
+  /* do NOT set height: 100% here — that would cap the page at viewport height
+     and prevent scrolling when dynamic content (SOS status panel) expands */
+  height: auto;
+}
+
+body {
+  background-color: var(--color-dark-bg);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  /* fill the screen on short pages, but grow freely beyond it */
+  min-height: 100vh;
+  /* leave room for the fixed bottom nav */
+  padding-bottom: calc(var(--bottom-nav-h) + 1.5rem);
+  /* ensure overflow is visible so nothing gets clipped */
+  overflow-y: auto;
+}
+
+/* ── Type scale ── */
+
+/* Page-level titles — larger, tighter tracking, heavier weight */
+.page-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Section headings within a card — slightly larger than Bootstrap fs-6 */
+.section-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1;
+}
+
+/* Page-level subtitle / lead */
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-muted-text);
+  margin-top: 0.2rem;
+}
+
+/* ── Navbar ── */
+.navbar {
+  min-height: var(--navbar-h);
+}
+
+.navbar-brand {
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+/* ── Bottom tab navigation ── */
+/* ── Profile menu button (top navbar) ── */
+.profile-btn {
+  color: #fff;
+  background: transparent;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+}
+
+.profile-btn:focus {
+  box-shadow: none;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-h);
+  z-index: 1030;
+  padding: 0 0.25rem;
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  text-decoration: none;
+  color: var(--color-muted-text);
+  font-size: 0.65rem;
+  padding: 0.4rem 0.25rem;
+  border-radius: 0.5rem;
+  transition: color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav__item i {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bottom-nav__item.active {
+  color: var(--color-heading-text);
+}
+
+/* :hover is scoped to real pointer devices only (mouse/trackpad).
+   Touchscreens report `hover: none`, so this can never get "stuck" on
+   whatever tab you last tapped — which is exactly what was making two
+   tabs look highlighted at once after using the back button on mobile. */
+@media (hover: hover) and (pointer: fine) {
+  .bottom-nav__item:hover {
+    color: var(--color-heading-text);
+  }
+}
+
+.bottom-nav__item:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Emergency contact cards ── */
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: #e0e0e0;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contact-card:hover {
+    background: var(--color-card-bg-raised);
+  }
+}
+
+.contact-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.35);
+}
+
+.contact-card--red    { border-left: 4px solid var(--color-danger); }
+.contact-card--orange { border-left: 4px solid var(--color-warning); }
+.contact-card--blue   { border-left: 4px solid var(--color-primary); }
+.contact-card--teal   { border-left: 4px solid var(--color-success); }
+
+.contact-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.contact-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-card__label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-heading-text);
+}
+
+.contact-card__number {
+  font-size: 0.8rem;
+  color: var(--color-muted-text);
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.1rem;
+}
+
+.contact-card__cta {
+  font-size: 1.1rem;
+  color: var(--color-muted-text);
+  flex-shrink: 0;
+}
+
+/* ── SOS pulsing button ── */
+.sos-btn {
+  position: relative;
+  /* Scales with available screen height so it can shrink enough to fit
+     the one-screen home layout on shorter phones, without ever getting
+     uncomfortably small on taller ones. */
+  width: clamp(118px, 28dvh, 170px);
+  height: clamp(118px, 28dvh, 170px);
+  border-radius: 50%;
+  border: none;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+  box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  animation: sos-pulse 2s infinite;
+}
+
+.sos-btn:hover {
+  filter: brightness(1.1);
+}
+
+.sos-btn:active {
+  transform: scale(0.93);
+  animation: none;
+}
+
+.sos-btn:disabled {
+  background: #555;
+  animation: none;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.sos-btn__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.sos-btn__inner i {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.sos-btn__ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 3px solid rgba(220, 53, 69, 0.4);
+  animation: sos-ring 2s infinite;
+  pointer-events: none;
+}
+
+@keyframes sos-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(220, 53, 69, 0.7); }
+  70%  { box-shadow: 0 0 0 20px rgba(220, 53, 69, 0);   }
+  100% { box-shadow: 0 0 0 0   rgba(220, 53, 69, 0);   }
+}
+
+@keyframes sos-ring {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  100% { transform: scale(1.35); opacity: 0;   }
+}
+
+/* ── Home page nav tiles ── */
+.tile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.1rem 0.75rem;
+  color: #e0e0e0;
+  /* full-width inside its col-6 grid cell */
+  width: 100%;
+  min-height: 88px;
+  text-align: center;
+  transition: transform 0.1s ease, background 0.12s ease, box-shadow 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* :hover scoped to real pointer devices only — see the bottom-nav
+   comment above for why this matters on touchscreens/back-navigation */
+@media (hover: hover) and (pointer: fine) {
+  .tile-card:hover {
+    background: var(--color-card-bg-raised);
+    color: var(--color-heading-text);
+  }
+}
+
+.tile-card:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* Icon sits above the label — larger than the label text */
+.tile-card__icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  display: block;
+  /* colour is set by Bootstrap text-* utility on the element in HTML */
+}
+
+.tile-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ccc;
+  line-height: 1.2;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile-card:hover .tile-card__label {
+    color: var(--color-heading-text);
+  }
+}
+
+/* ── Home page: fits one screen, no vertical scrolling ──
+   Height is exactly the viewport minus the known navbar + bottom-nav
+   heights, so this works without guessing navbar content height. The
+   two direct children (top group, SOS group) get pushed to the very
+   top and very bottom via space-between — that's what moves SOS down
+   to where a thumb can reach it fastest. */
+.home-fit-screen {
+  min-height: calc(100dvh - var(--navbar-h) - var(--bottom-nav-h) - 1rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+/* ── Quick-circle row — national numbers + pinned personal contacts ──
+   One horizontally-scrolling row (its own scrollbar hidden) so it can
+   never cause the page itself to scroll vertically, no matter how many
+   contacts are pinned. */
+.quick-circle-row {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.15rem 0.1rem 0.4rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.quick-circle-row::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  width: 60px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quick-circle__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: #fff;
+  background: var(--color-danger);
+  transition: transform 0.1s ease;
+  flex-shrink: 0;
+}
+
+.quick-circle__icon--warning { background: var(--color-warning); color: #3a2e00; }
+.quick-circle__icon--success { background: var(--color-success); }
+.quick-circle__icon--info    { background: var(--color-info); color: #04323d; }
+.quick-circle__icon--primary { background: var(--color-primary); }
+
+.quick-circle:active .quick-circle__icon {
+  transform: scale(0.92);
+}
+
+.quick-circle__name {
+  font-size: 0.64rem;
+  color: var(--color-muted-text);
+  text-align: center;
+  line-height: 1.1;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Personal (custom) emergency contacts — contacts.html ── */
+.custom-contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-info);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.custom-contact-item__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.custom-contact-item__name {
+  font-weight: 600;
+  color: var(--color-heading-text);
+  font-size: 0.95rem;
+}
+
+.custom-contact-item__relation {
+  font-size: 0.7rem;
+  color: var(--color-muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.custom-contact-item__phone {
+  font-size: 0.85rem;
+  color: var(--color-muted-text);
+}
+
+.custom-contact-item__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* ── Section cards (security_info, admin headings) ── */
+
+/* Shared base for all info-section cards */
+.info-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+/* Body text inside info-cards — override Bootstrap's too-dim text-muted */
+.info-card .text-muted {
+  color: var(--color-muted-text) !important;
+}
+
+/* Paragraph / span body copy inside info-cards — ensure it's readable */
+.info-card p,
+.info-card span:not([class*="text-"]):not(.info-card__heading-text),
+.info-card td {
+  color: var(--color-body-text);
+}
+
+/* table-dark inside info-cards: keep header muted, body readable */
+.info-card .table-dark td {
+  color: var(--color-body-text);
+}
+.info-card .table-dark .text-muted {
+  color: var(--color-muted-text) !important;
+}
+
+/* Coloured top bar that gives each card its own identity */
+.info-card__bar {
+  height: 4px;
+  width: 100%;
+}
+.info-card__bar--danger  { background: var(--color-danger); }
+.info-card__bar--warning { background: var(--color-warning); }
+.info-card__bar--success { background: var(--color-success); }
+.info-card__bar--info    { background: var(--color-info); }
+.info-card__bar--secondary { background: #6c757d; }
+
+.info-card__body {
+  padding: 1rem 1rem 1.1rem;
+}
+
+/* Section heading inside an info-card */
+.info-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.info-card__heading-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  color: #fff;
+}
+.info-card__heading-icon--danger  { background: rgba(220, 53, 69,  0.25); color: #ff6b6b; }
+.info-card__heading-icon--warning { background: rgba(255, 193, 7,  0.2);  color: var(--color-warning); }
+.info-card__heading-icon--success { background: rgba(25,  135, 84, 0.25); color: #5fcf8a; }
+.info-card__heading-icon--info    { background: rgba(13,  202, 240, 0.2); color: var(--color-info); }
+.info-card__heading-icon--secondary { background: rgba(108, 117, 125, 0.2); color: #adb5bd; }
+
+.info-card__heading-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #ddd;
+}
+
+/* ── Safety guideline list ── */
+.safety-list li {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.safety-list li:last-child {
+  border-bottom: none;
+}
+
+/* Critical tips — visually elevated */
+.safety-list__group-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-text);
+  padding-top: 0.5rem;
+  padding-bottom: 0.1rem;
+  border-bottom: none !important;
+}
+
+.safety-list li.tip--critical {
+  background: rgba(220, 53, 69, 0.07);
+  border-radius: 0.35rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-bottom: 1px solid rgba(220, 53, 69, 0.18);
+}
+
+/* ── Muster point tiles ── */
+.muster-point {
+  background: var(--color-card-bg);
+  font-size: 0.8rem;
+  color: var(--color-body-text);
+  cursor: default;
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .muster-point:hover {
+    background: var(--color-card-bg-raised);
+    color: var(--color-heading-text);
+  }
+}
+
+.muster-point:active {
+  transform: scale(0.96);
+}
+
+/* ── Admin section headers ── */
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-section-header--warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 3px solid var(--color-warning);
+}
+
+.admin-section-header--danger {
+  background: rgba(220, 53, 69, 0.1);
+  border-left: 3px solid var(--color-danger);
+}
+
+.admin-section-header--success {
+  background: rgba(25, 135, 84, 0.1);
+  border-left: 3px solid var(--color-success);
+}
+
+.admin-section-header--info {
+  background: rgba(13, 202, 240, 0.1);
+  border-left: 3px solid var(--color-info);
+}
+
+.admin-section-header__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex: 1;
+}
+
+/* ── Admin table ── */
+.report-desc {
+  max-width: 260px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Form overrides (dark inputs) ── */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ── Off-canvas nav links ── */
+.nav-list .list-group-item {
+  padding: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav-list .nav-link:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 0;
+  }
+}
+
+/* ============================================================
+   Operator Console — second interface, staff-only
+   Deliberately distinct from the student theme above: slate/blue
+   instead of red, so it never gets mistaken for the public app.
+   ============================================================ */
+
+.operator-shell {
+  /* same dark canvas as the student app, but no bottom-nav padding
+     since the operator console has no bottom tab bar */
+  padding-bottom: 1.5rem;
+}
+
+.operator-navbar {
+  background: #101a2b;
+  border-bottom: 1px solid #1f2c45;
+}
+
+/* ── Login card ── */
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  padding: 1.75rem 1.5rem;
+  margin-top: 2rem;
+}
+
+.login-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(13, 110, 253, 0.18);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Red variant for the student-facing auth pages (welcome/signup/login/
+   profile-setup), so they match the student app's red theme instead of
+   the operator console's blue — same shape, different accent color. */
+.login-card__icon--danger {
+  background: rgba(220, 53, 69, 0.18);
+  color: var(--color-danger);
+}
+
+/* ── Auto-refresh toggle ── */
+.auto-refresh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-muted-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.auto-refresh-toggle input {
+  cursor: pointer;
+}
+
+/* ── Summary stat cards ── */
+.stat-card {
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid transparent;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+}
+
+.stat-card--danger  { border-left-color: var(--color-danger); }
+.stat-card--warning { border-left-color: var(--color-warning); }
+
+.stat-card__value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-heading-text);
+  line-height: 1;
+}
+
+.stat-card__label {
+  font-size: 0.7rem;
+  color: var(--color-muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.3rem;
+}
+
+/* ── Status badges (reports + SOS alerts) ── */
+.status-badge--active,
+.status-badge--new {
+  background: rgba(220, 53, 69, 0.2);
+  color: #ff8a8a;
+}
+
+.status-badge--acknowledged {
+  background: rgba(255, 193, 7, 0.2);
+  color: var(--color-warning);
+}
+
+.status-badge--handled,
+.status-badge--resolved {
+  background: rgba(25, 135, 84, 0.2);
+  color: #5fcf8a;
+}
+
+.status-select {
+  width: auto;
+  font-size: 0.75rem;
+  padding: 0.15rem 1.6rem 0.15rem 0.5rem;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border-color: var(--color-border);
+}
+
+/* Subtly highlight rows that still need action */
+tr.table-alert-active {
+  box-shadow: inset 3px 0 0 var(--color-danger);
+}
+
+/* ── Staff portal link on the student side (subtle, not a main action) ── */
+.staff-portal-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.75rem;
+  color: var(--color-muted-text) !important;
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .staff-portal-link:hover {
+    color: #ccc !important;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
+  .sos-btn {
+    width: 150px;
+    height: 150px;
+    font-size: 1.2rem;
+  }
+  .sos-btn__inner i {
+    font-size: 2rem;
+  }
+  .tile-card {
+    min-height: 76px;
+    padding: 0.85rem 0.5rem;
+  }
+  .tile-card__icon {
+    font-size: 1.35rem;
+  }
+}
