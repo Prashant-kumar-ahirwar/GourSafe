@@ -34,10 +34,17 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
   />
   <!-- Custom styles (overrides only — Bootstrap handles the rest) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=12" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=13" />
   {% block extra_styles %}{% endblock %}
+  <style>
+    /* thin progress bar: shows at once when a link is tapped, so page changes feel instant */
+    #navBar{position:fixed;top:0;left:0;height:3px;width:0;background:#fff;z-index:2000;opacity:0;pointer-events:none;
+            box-shadow:0 0 6px rgba(255,255,255,.8);transition:width .4s ease-out,opacity .2s}
+    #navBar.on{opacity:1;width:80%;transition:width 6s cubic-bezier(.1,.8,.2,1),opacity .1s}
+  </style>
 </head>
 <body>
+  <div id="navBar" aria-hidden="true"></div>
 
   <!-- ── Sticky top navbar ── -->
   <nav class="navbar navbar-dark bg-danger sticky-top shadow-sm">
@@ -221,6 +228,22 @@
   <!-- Android app features (no-op in a normal browser) -->
   <script src="{{ url_for('static', filename='js/native-safety.js') }}"></script>
 
+  <script>
+    // Show the progress bar when a normal same-site link is tapped
+    (function () {
+      var bar = document.getElementById("navBar");
+      document.addEventListener("click", function (e) {
+        var a = e.target.closest && e.target.closest("a[href]");
+        if (!a || e.defaultPrevented || a.target === "_blank" || a.hasAttribute("download")) return;
+        var h = a.getAttribute("href");
+        if (!h || h.charAt(0) === "#" || /^(tel|mailto|javascript):/i.test(h) || a.hasAttribute("data-bs-toggle")) return;
+        if (a.origin && a.origin !== location.origin) return;
+        bar.classList.add("on");
+      });
+      // coming back with the Back button: hide it again
+      window.addEventListener("pageshow", function () { bar.classList.remove("on"); });
+    })();
+  </script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

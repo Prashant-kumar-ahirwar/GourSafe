@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, jsonify, g, session
 from psycopg import connect as psycopg_connect
 from psycopg.rows import dict_row
+from psycopg import OperationalError, InterfaceError
 import hmac
+import threading
 import secrets
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -102,8 +104,24 @@ def get_current_user():
     user_id = session.get("user_id")
     if not user_id:
         return None
-    db = get_db()
-    return db.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    # Looked up at most once per request (it used to be 2 identical queries per page)
+    if not hasattr(g, "_current_user"):
+        db = get_db()
+        g._current_user = db.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    return g._current_user
+
+
+def remember_user(user):
+    # Keep the few facts every page needs (name, email, profile done?) inside the
+    # signed login cookie, so normal page loads need NO database query at all.
+    session["u_name"] = user["name"]
+    session["u_email"] = user["email"]
+    session["u_done"] = bool(user["profile_completed"])
+
+
+def forget_user():
+    for key in ("user_id", "guest", "u_name", "u_email", "u_done"):
+        session.pop(key, None)
 
 
 @app.context_processor
@@ -111,7 +129,15 @@ def inject_current_user():
     # Makes `current_user` available in every template automatically
     # (used by the profile dropdown in base.html) without every single
     # route having to fetch and pass it manually.
-    return {"current_user": get_current_user() if session.get("user_id") else None}
+    if not session.get("user_id"):
+        return {"current_user": None}
+    if "u_name" not in session:
+        # Older login cookie from before this change: fill it in once
+        user = get_current_user()
+        if user is None:
+            return {"current_user": None}
+        remember_user(user)
+    return {"current_user": {"name": session["u_name"], "email": session["u_email"]}}
 
 
 @app.before_request
@@ -131,8 +157,14 @@ def require_login_or_guest():
     if session.get("user_id") and endpoint != "profile_setup":
         # Signed-up (non-guest) users must finish their profile once,
         # right after signing up, before using the rest of the app.
-        user = get_current_user()
-        if user is not None and not user["profile_completed"]:
+        # The answer is kept in the login cookie, so this is normally free.
+        if "u_done" not in session:
+            user = get_current_user()
+            if user is None:            # account no longer exists
+                forget_user()
+                return redirect(url_for("welcome"))
+            remember_user(user)
+        if not session["u_done"]:
             return redirect(url_for("profile_setup"))
 
 # ---------------------------------------------------------------------------
@@ -184,43 +216,74 @@ class CursorProxy:
         return self._cursor.rowcount
 
 
-class PostgresConnection:
-    def __init__(self, connection):
-        self.connection = connection
+# One database connection is kept and reused between requests (per worker).
+# Opening a fresh TLS connection to Supabase for every page was the biggest
+# cause of slow page changes. autocommit=True means reads never leave a
+# transaction open on the shared connection (db.commit() is then a no-op).
+_conn_holder = threading.local()
 
+
+def _open_connection():
+    return psycopg_connect(
+        DATABASE_URL,
+        sslmode="require",
+        autocommit=True,
+        connect_timeout=10,
+        prepare_threshold=None,   # also safe behind the Supabase pooler (pgbouncer)
+    )
+
+
+def _shared_connection(force_new=False):
+    conn = getattr(_conn_holder, "conn", None)
+    if force_new or conn is None or conn.closed:
+        if conn is not None and not conn.closed:
+            try:
+                conn.close()
+            except Exception:
+                pass
+        conn = _conn_holder.conn = _open_connection()
+    return conn
+
+
+class PostgresConnection:
     def execute(self, query, params=()):
-        cursor = self.connection.cursor(row_factory=dict_row)
-        cursor.execute(query.replace("?", "%s"), params)
-        return CursorProxy(cursor)
+        sql = query.replace("?", "%s")
+        for attempt in (1, 2):
+            try:
+                cursor = _shared_connection(force_new=(attempt == 2)).cursor(row_factory=dict_row)
+                cursor.execute(sql, params)
+                return CursorProxy(cursor)
+            except (OperationalError, InterfaceError):
+                # The idle connection was dropped by the server: reconnect once and retry
+                if attempt == 2:
+                    raise
 
     def commit(self):
-        self.connection.commit()
+        pass  # autocommit is on
 
     def close(self):
-        self.connection.close()
+        pass  # the connection is shared, so it is NOT closed after each request
 
 
 def get_db():
-    # Open a request-scoped connection to Supabase Postgres.
     db = getattr(g, "_database", None)
     if db is None:
-        db = g._database = PostgresConnection(
-            psycopg_connect(DATABASE_URL, sslmode="require")
-        )
+        db = g._database = PostgresConnection()
     return db
 
 
 @app.teardown_appcontext
 def close_db(exception):
-    # Close the connection automatically when the request context ends.
-    db = getattr(g, "_database", None)
-    if db is not None:
-        db.close()
+    g.pop("_database", None)
 
 
 def init_db():
-    # Create the Supabase schema if it has not already been created in SQL Editor.
-    db = psycopg_connect(DATABASE_URL, sslmode="require")
+    # Create / upgrade the schema. All statements go to the server in ONE round trip,
+    # so a cold start is much quicker. Set INIT_DB=0 in Vercel once the tables exist
+    # to skip this entirely.
+    if os.environ.get("INIT_DB", "1") == "0":
+        return
+    db = psycopg_connect(DATABASE_URL, sslmode="require", connect_timeout=10)
     try:
         cursor = db.cursor()
         cursor.execute("""
@@ -232,9 +295,7 @@ def init_db():
                 description TEXT NOT NULL,
                 status      TEXT NOT NULL DEFAULT 'new',
                 created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            )
-        """)
-        cursor.execute("""
+            );
             CREATE TABLE IF NOT EXISTS public.sos_alerts (
                 id          BIGSERIAL PRIMARY KEY,
                 latitude    DOUBLE PRECISION NOT NULL,
@@ -242,9 +303,7 @@ def init_db():
                 accuracy    DOUBLE PRECISION,
                 status      TEXT NOT NULL DEFAULT 'active',
                 created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            )
-        """)
-        cursor.execute("""
+            );
             CREATE TABLE IF NOT EXISTS public.users (
                 id                       BIGSERIAL PRIMARY KEY,
                 name                     TEXT NOT NULL,
@@ -255,9 +314,7 @@ def init_db():
                 emergency_contact_phone  TEXT,
                 profile_completed        BOOLEAN NOT NULL DEFAULT FALSE,
                 created_at               TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            )
-        """)
-        cursor.execute("""
+            );
             CREATE TABLE IF NOT EXISTS public.custom_contacts (
                 id          BIGSERIAL PRIMARY KEY,
                 user_id     BIGINT NOT NULL REFERENCES public.users (id),
@@ -266,14 +323,14 @@ def init_db():
                 relation    TEXT,
                 pinned      BOOLEAN NOT NULL DEFAULT FALSE,
                 created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            )
+            );
+            ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS track_token TEXT;
+            ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ;
+            ALTER TABLE public.reports ADD COLUMN IF NOT EXISTS user_id BIGINT;
+            ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS user_id BIGINT;
+            CREATE INDEX IF NOT EXISTS reports_user_idx ON public.reports (user_id, created_at DESC);
+            CREATE INDEX IF NOT EXISTS sos_alerts_user_idx ON public.sos_alerts (user_id, created_at DESC);
         """)
-        # Live-tracking columns (safe to run repeatedly)
-        cursor.execute("ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS track_token TEXT")
-        cursor.execute("ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ")
-        # Link reports / SOS alerts to the signed-in student so they can see them in "My Reports"
-        cursor.execute("ALTER TABLE public.reports ADD COLUMN IF NOT EXISTS user_id BIGINT")
-        cursor.execute("ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS user_id BIGINT")
         db.commit()
     except Exception:
         db.rollback()
@@ -322,9 +379,10 @@ def signup():
         )
         db.commit()
 
-        new_user = db.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
+        new_user = db.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
         session["user_id"] = new_user["id"]
         session.pop("guest", None)
+        remember_user(new_user)
         return redirect(url_for("profile_setup"))
 
     return render_template("signup.html")
@@ -346,6 +404,7 @@ def login():
 
         session["user_id"] = user["id"]
         session.pop("guest", None)
+        remember_user(user)
         if not user["profile_completed"]:
             return redirect(url_for("profile_setup"))
         return redirect(url_for("index"))
@@ -356,8 +415,8 @@ def login():
 @app.route("/guest")
 def guest_login():
     # No account, no profile step — straight to the student home page.
+    forget_user()
     session["guest"] = True
-    session.pop("user_id", None)
     return redirect(url_for("index"))
 
 
@@ -382,6 +441,7 @@ def profile_setup():
             (phone, ec_name, ec_phone, session["user_id"])
         )
         db.commit()
+        session["u_done"] = True
         return redirect(url_for("index"))
 
     return render_template("profile_setup.html")
@@ -409,6 +469,8 @@ def edit_profile():
             (name, phone, ec_name, ec_phone, session["user_id"])
         )
         db.commit()
+        session["u_name"] = name
+        g.pop("_current_user", None)   # re-read the saved values
         return render_template("edit_profile.html", user=get_current_user(), saved=True)
 
     return render_template("edit_profile.html", user=get_current_user())
@@ -468,8 +530,7 @@ def settings():
 def logout():
     # Student-side logout — separate from operator_logout. Clears both
     # possible session states (signed-in or guest) and returns to welcome.
-    session.pop("user_id", None)
-    session.pop("guest", None)
+    forget_user()
     return redirect(url_for("welcome"))
 
 
