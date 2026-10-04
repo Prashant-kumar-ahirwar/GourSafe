@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}You're Offline{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center text-center py-5">
+
+  <div class="mb-4" style="font-size:4rem; line-height:1;">
+    <i class="bi bi-wifi-off text-secondary"></i>
+  </div>
+
+  <h1 class="fs-4 fw-bold text-white mb-2">You're offline</h1>
+  <p class="text-muted mb-4" style="max-width:300px;">
+    No internet connection right now. The pages you've already visited are
+    still available — navigate back to use them.
+  </p>
+
+  <!-- National emergency numbers are always on the device — safe to show -->
+  <div class="info-card w-100 mb-4" style="max-width:340px; text-align:left;">
+    <div class="info-card__bar info-card__bar--danger"></div>
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--danger">
+          <i class="bi bi-telephone-fill"></i>
+        </span>
+        <span class="info-card__heading-text">Emergency numbers — always work</span>
+      </div>
+      <div class="d-grid gap-2">
+        <a href="tel:112" class="btn btn-danger btn-sm">
+          <i class="bi bi-shield-fill-exclamation me-2"></i>All Emergencies — 112
+        </a>
+        <a href="tel:100" class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-patch-check-fill me-2"></i>Police — 100
+        </a>
+        <a href="tel:108" class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-heart-pulse-fill me-2"></i>Ambulance — 108
+        </a>
+        <a href="tel:101" class="btn btn-outline-warning btn-sm">
+          <i class="bi bi-fire me-2"></i>Fire Service — 101
+        </a>
+        <a href="tel:1091" class="btn btn-outline-success btn-sm">
+          <i class="bi bi-gender-female me-2"></i>Women's Helpline — 1091
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="location.reload()" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-arrow-clockwise me-2"></i>Try again
+  </button>
+
+</div>
+{% endblock %}

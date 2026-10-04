@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="py-3">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <p class="text-danger fw-bold mb-1">Settings</p>
+      <h2 class="page-title mb-0">Account preferences</h2>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <div class="fw-bold">Profile</div>
+          <small class="text-muted">Manage your personal safety details.</small>
+        </div>
+        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-light">View profile</a>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <div class="fw-bold">Edit details</div>
+          <small class="text-muted">Update contact information and emergency numbers.</small>
+        </div>
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-sm btn-outline-light">Edit</a>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="fw-bold">Theme</div>
+          <small class="text-muted">Switch between dark and light display modes.</small>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger" onclick="toggleTheme()">Toggle theme</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shown only inside the Android app (native-safety.js removes d-none) -->
+  <div id="nativeSafetyCard" class="card border-0 shadow-sm mb-3 d-none">
+    <div class="card-body">
+      <div class="fw-bold mb-1">SOS safety mode</div>
+      <small class="text-muted d-block mb-3">What your phone does when you press SOS.</small>
+
+      <div class="form-check form-switch mb-2">
+        <input class="form-check-input" type="checkbox" id="nsSilent">
+        <label class="form-check-label" for="nsSilent">Silence phone (Do Not Disturb, no sound or vibration)</label>
+      </div>
+      <div class="form-check form-switch mb-3">
+        <input class="form-check-input" type="checkbox" id="nsDim">
+        <label class="form-check-label" for="nsDim">Dim the screen</label>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <div class="fw-bold">Do Not Disturb access</div>
+          <small class="text-muted">Android needs your permission once.</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span id="nsAccess" class="badge bg-secondary">...</span>
+          <button type="button" id="nsGrant" class="btn btn-sm btn-outline-light">Grant</button>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="fw-bold">Safe PIN</div>
+        <small class="text-muted d-block mb-2">Needed to end SOS mode, so nobody else can switch it off. <span id="nsPinState"></span></small>
+        <div class="input-group input-group-sm">
+          <input type="password" inputmode="numeric" maxlength="8" class="form-control" id="nsPin" placeholder="4 to 8 digits">
+          <button type="button" id="nsSavePin" class="btn btn-danger">Save PIN</button>
+        </div>
+      </div>
+
+      <button type="button" id="nsReview" class="btn btn-sm btn-outline-light w-100 mb-2">Review app permissions</button>
+      <button type="button" id="nsTest" class="btn btn-sm btn-outline-light w-100">Test silent mode (5 seconds)</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

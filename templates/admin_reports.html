@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Admin — Reports{% endblock %}
+
+{% block content %}
+
+<!-- Page title -->
+<div class="mb-4 d-flex align-items-start justify-content-between flex-wrap gap-2">
+  <div>
+    <h1 class="page-title text-white">
+      <i class="bi bi-table me-2 text-secondary"></i>Admin
+    </h1>
+    <p class="page-subtitle">All submitted reports and SOS alerts.</p>
+  </div>
+  <span class="badge bg-secondary mt-1">Demo only — no auth</span>
+</div>
+
+<!-- ── Incident Reports section ── -->
+<div class="admin-section-header admin-section-header--warning mb-3">
+  <i class="bi bi-flag-fill text-warning"></i>
+  <span class="admin-section-header__title text-warning">Incident Reports</span>
+  <span class="badge bg-warning text-dark ms-auto">{{ reports | length }}</span>
+</div>
+
+{% if reports %}
+<div class="table-responsive mb-5">
+  <table class="table table-dark table-hover table-sm align-middle">
+    <thead>
+      <tr class="text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;">
+        <th scope="col">#</th>
+        <th scope="col">Time (UTC)</th>
+        <th scope="col">Category</th>
+        <th scope="col">Reporter</th>
+        <th scope="col">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reports %}
+      <tr>
+        <td class="text-muted">{{ r['id'] }}</td>
+        <td class="text-nowrap small">{{ r['created_at'] }}</td>
+        <td><span class="badge bg-warning text-dark">{{ r['category'] }}</span></td>
+        <td class="small">
+          {% if r['anonymous'] %}
+            <span class="text-muted fst-italic">Anonymous</span>
+          {% else %}
+            {{ r['name'] or '—' }}
+          {% endif %}
+        </td>
+        <td class="small report-desc">{{ r['description'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-secondary mb-5 d-flex align-items-center gap-2" role="alert">
+  <i class="bi bi-inbox flex-shrink-0"></i>
+  <span>No incident reports yet.</span>
+</div>
+{% endif %}
+
+<!-- ── SOS Alerts section ── -->
+<div class="admin-section-header admin-section-header--danger mb-3">
+  <i class="bi bi-geo-alt-fill text-danger"></i>
+  <span class="admin-section-header__title text-danger">SOS Alerts</span>
+  <span class="badge bg-danger ms-auto">{{ sos_alerts | length }}</span>
+</div>
+
+{% if sos_alerts %}
+<div class="table-responsive">
+  <table class="table table-dark table-hover table-sm align-middle">
+    <thead>
+      <tr class="text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;">
+        <th scope="col">#</th>
+        <th scope="col">Time (UTC)</th>
+        <th scope="col">Latitude</th>
+        <th scope="col">Longitude</th>
+        <th scope="col">Accuracy (m)</th>
+        <th scope="col">Map</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in sos_alerts %}
+      <tr>
+        <td class="text-muted">{{ p['id'] }}</td>
+        <td class="text-nowrap small">{{ p['created_at'] }}</td>
+        <td class="small">{{ "%.6f" | format(p['latitude']) }}</td>
+        <td class="small">{{ "%.6f" | format(p['longitude']) }}</td>
+        <td class="small">{{ "%.1f" | format(p['accuracy']) }}</td>
+        <td>
+          <a
+            href="https://www.openstreetmap.org/?mlat={{ p['latitude'] }}&mlon={{ p['longitude'] }}&zoom=17"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-outline-info btn-sm py-0"
+            aria-label="View on map"
+          >
+            <i class="bi bi-map"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-secondary d-flex align-items-center gap-2" role="alert">
+  <i class="bi bi-inbox flex-shrink-0"></i>
+  <span>No SOS alerts yet.</span>
+</div>
+{% endif %}
+
+{% endblock %}

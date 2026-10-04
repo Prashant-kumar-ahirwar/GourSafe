@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#c0392b" />
+  <title>{% block title %}Campus Safety{% endblock %} — GourSafe</title>
+
+  <!-- Apply the saved theme before any CSS paints, so there's no flash
+       of the wrong theme. Sets the SAME attribute Bootstrap 5.3 itself
+       uses for its own dark/light mode, so bg-dark/text-white/etc all
+       flip automatically along with our custom --color-* variables. -->
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('goursafe-theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+      }
+    })();
+  </script>
+
+  <!-- Bootstrap 5 CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  />
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  />
+  <!-- Custom styles (overrides only — Bootstrap handles the rest) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=10" />
+  {% block extra_styles %}{% endblock %}
+</head>
+<body>
+
+  <!-- ── Sticky top navbar ── -->
+  <nav class="navbar navbar-dark bg-danger sticky-top shadow-sm">
+    <div class="app-container d-flex align-items-center justify-content-between px-3 w-100">
+
+      <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+        <i class="bi bi-shield-fill-exclamation fs-5"></i>
+        <span class="d-flex flex-column lh-sm">
+          <span>GourSafe</span>
+          <span class="navbar-subtitle fw-normal">Dr. Harisingh Gour Vishwavidyalaya</span>
+        </span>
+      </a>
+
+      <div class="desktop-nav" aria-label="Main navigation">
+        <a class="desktop-nav__link {{ 'active' if request.endpoint == 'index' }}" href="{{ url_for('index') }}">
+          <i class="bi bi-house-fill" aria-hidden="true"></i>Home
+        </a>
+        <a class="desktop-nav__link {{ 'active' if request.endpoint == 'contacts' }}" href="{{ url_for('contacts') }}">
+          <i class="bi bi-telephone-fill" aria-hidden="true"></i>Contacts
+        </a>
+        <a class="desktop-nav__link {{ 'active' if request.endpoint == 'security_info' }}" href="{{ url_for('security_info') }}">
+          <i class="bi bi-building-lock" aria-hidden="true"></i>Security
+        </a>
+        <a class="desktop-nav__link {{ 'active' if request.endpoint == 'report' }}" href="{{ url_for('report') }}">
+          <i class="bi bi-flag-fill" aria-hidden="true"></i>Report
+        </a>
+      </div>
+
+      <div class="d-flex align-items-center gap-1">
+        <!-- Keep the top navigation clean: only the brand and the profile action remain.
+             No hamburger/menu icon is used, which keeps the layout simpler and more
+             consistent across mobile, tablet, and desktop screens. -->
+        <div class="dropdown">
+          <button
+            class="btn profile-btn"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            aria-label="Profile menu"
+          >
+            <i class="bi bi-person-circle fs-5"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            {% if session.get('user_id') and current_user %}
+              <li class="px-3 py-2">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="bi bi-person-fill text-white small"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold small">{{ current_user['name'] }}</div>
+                    <div class="text-muted" style="font-size:0.7rem;">{{ current_user['email'] }}</div>
+                  </div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('profile') }}">
+                  <i class="bi bi-person-vcard me-2"></i>My Profile
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('settings') }}">
+                  <i class="bi bi-gear me-2"></i>Settings
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('edit_profile') }}">
+                  <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                </a>
+              </li>
+            {% elif session.get('guest') %}
+              <li class="px-3 py-2">
+                <div class="fw-bold small"><i class="bi bi-person-badge me-1"></i>Guest Session</div>
+                <div class="text-muted small">Sign in or create an account to save your profile.</div>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('login') }}">
+                  <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('signup') }}">
+                  <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                </a>
+              </li>
+            {% else %}
+              <li class="px-3 py-2">
+                <div class="fw-bold small"><i class="bi bi-person-slash me-1"></i>No session</div>
+                <div class="text-muted small">Sign in to view your saved profile.</div>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('login') }}">
+                  <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{ url_for('signup') }}">
+                  <i class="bi bi-person-plus-fill me-2"></i>Sign Up
+                </a>
+              </li>
+            {% endif %}
+            <li>
+              <a class="dropdown-item" href="#" onclick="toggleTheme(); return false;">
+                <i class="bi bi-moon-stars-fill me-2" data-theme-icon></i><span data-theme-label>Dark Mode</span>
+              </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item text-muted small" href="{{ url_for('operator_login') }}">
+                <i class="bi bi-shield-lock me-2"></i>Staff / Operator Login
+              </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                <i class="bi bi-box-arrow-right me-2"></i>{{ 'End Guest Session' if session.get('guest') else 'Log Out' }}
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Page content ──
+       Home gets tighter padding + the fits-one-screen layout class;
+       every other page keeps the normal py-4, scrolls if it needs to. -->
+  <main class="app-container px-3 {{ 'py-2' if request.endpoint == 'index' else 'py-4' }}">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Bottom tab bar (mobile shortcut strip) ──
+       The outer <nav> spans the full browser width so its background
+       and top border reach both edges, but the actual icons live in an
+       .app-container inner wrapper so they line up with the content
+       column above instead of spreading edge-to-edge on wide screens. -->
+  <nav class="bottom-nav bg-dark border-top border-secondary" aria-label="Main navigation">
+    <div class="app-container d-flex justify-content-around align-items-center h-100">
+      <a href="{{ url_for('index') }}"
+         class="bottom-nav__item {{ 'active' if request.endpoint == 'index' }}"
+         aria-label="Home and SOS">
+        <i class="bi bi-house-fill"></i>
+        <span>Home</span>
+      </a>
+      <a href="{{ url_for('contacts') }}"
+         class="bottom-nav__item {{ 'active' if request.endpoint == 'contacts' }}"
+         aria-label="Emergency contacts">
+        <i class="bi bi-telephone-fill"></i>
+        <span>Contacts</span>
+      </a>
+      <a href="{{ url_for('security_info') }}"
+         class="bottom-nav__item {{ 'active' if request.endpoint == 'security_info' }}"
+         aria-label="Campus security info">
+        <i class="bi bi-building-lock"></i>
+        <span>Security</span>
+      </a>
+      <a href="{{ url_for('report') }}"
+         class="bottom-nav__item {{ 'active' if request.endpoint == 'report' }}"
+         aria-label="Report incident">
+        <i class="bi bi-flag-fill"></i>
+        <span>Report</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Bootstrap 5 JS bundle (includes Popper) -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <!-- Site-wide JS: SOS logic + form helpers -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <!-- Android app features (no-op in a normal browser) -->
+  <script src="{{ url_for('static', filename='js/native-safety.js') }}"></script>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

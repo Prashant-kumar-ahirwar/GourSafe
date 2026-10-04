@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Campus Security{% endblock %}
+
+{% block content %}
+<div class="security-page">
+
+  <!-- Page title -->
+  <div class="mb-3">
+    <h1 class="page-title text-warning">
+      <i class="bi bi-building-lock me-2"></i>Campus Security
+    </h1>
+    <p class="page-subtitle mb-0">Know where to go and what to do.</p>
+  </div>
+
+  <!-- Quick actions (both already exist in the app) -->
+  <div class="sec-actions">
+    <a href="tel:112" class="btn btn-danger">
+      <i class="bi bi-telephone-fill"></i>Call 112
+    </a>
+    <a href="{{ url_for('report') }}" class="btn btn-outline-light">
+      <i class="bi bi-flag-fill"></i>Report
+    </a>
+  </div>
+
+  <!-- Security office -->
+  <div class="info-card">
+    <div class="info-card__bar info-card__bar--info"></div>
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--info">
+          <i class="bi bi-geo-alt-fill"></i>
+        </span>
+        <span class="info-card__heading-text">Security Office</span>
+      </div>
+      <div class="sec-line">
+        <i class="bi bi-shield-check text-info"></i>
+        <span class="sec-line__title">Security Control Room</span>
+      </div>
+      <div class="sec-line">
+        <i class="bi bi-signpost-2 text-muted"></i>
+        <span class="text-muted">Main Gate, University Road (Gour Nagar)</span>
+      </div>
+      <div class="sec-line">
+        <i class="bi bi-building text-muted"></i>
+        <span class="text-muted">Dr. Harisingh Gour Vishwavidyalaya, Sagar &ndash; 470003, M.P.</span>
+      </div>
+      <div class="sec-line">
+        <i class="bi bi-geo-alt text-muted"></i>
+        <span class="text-muted">Pathariya Hills, Vindhya Range &mdash; about 5 km east of Sagar city</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hours -->
+  <div class="info-card">
+    <div class="info-card__bar info-card__bar--warning"></div>
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--warning">
+          <i class="bi bi-clock-fill"></i>
+        </span>
+        <span class="info-card__heading-text">Hours</span>
+      </div>
+      <div class="sec-row">
+        <span class="text-muted">Main Gate Post</span>
+        <span class="sec-row__time">24 / 7</span>
+      </div>
+      <div class="sec-row">
+        <span class="text-muted">Security Office</span>
+        <span class="sec-row__time">7 AM &ndash; 10 PM</span>
+      </div>
+      <div class="sec-row">
+        <span class="text-muted">Emergency Line</span>
+        <span class="sec-row__time text-danger">24 / 7</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patrol schedule (sits below the hours) -->
+  <div class="info-card">
+    <div class="info-card__bar info-card__bar--info"></div>
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--info">
+          <i class="bi bi-person-walking"></i>
+        </span>
+        <span class="info-card__heading-text">Patrol Schedule</span>
+      </div>
+      <div class="sec-row">
+        <span class="text-muted">Night Patrol</span>
+        <span class="sec-row__time">10 PM &ndash; 6 AM</span>
+      </div>
+      <div class="sec-row">
+        <span class="text-muted">Status now</span>
+        <span id="patrolStatus" class="patrol-pill" data-state="off">Checking&hellip;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety guidance -->
+  <div class="info-card">
+    <div class="info-card__bar info-card__bar--danger"></div>
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--danger">
+          <i class="bi bi-journal-check"></i>
+        </span>
+        <span class="info-card__heading-text">Safety Guidance</span>
+      </div>
+
+      <div class="tip-group">Critical</div>
+      <div class="tip tip--critical">
+        <i class="bi bi-exclamation-circle-fill text-danger"></i>
+        <span><strong>Do not confront</strong> suspicious persons. Report them to security immediately.</span>
+      </div>
+      <div class="tip tip--critical">
+        <i class="bi bi-exclamation-circle-fill text-danger"></i>
+        <span>Use the <strong>SOS button</strong> on the home screen if you cannot speak safely on a call.</span>
+      </div>
+
+      <div class="tip-group">Daily habits</div>
+      <div class="tip">
+        <i class="bi bi-check-circle-fill text-success"></i>
+        <span>Always carry your student ID on campus.</span>
+      </div>
+      <div class="tip">
+        <i class="bi bi-check-circle-fill text-success"></i>
+        <span>Keep your hostel room locked at all times, even when inside.</span>
+      </div>
+      <div class="tip">
+        <i class="bi bi-check-circle-fill text-success"></i>
+        <span>Walk in well-lit areas at night and use shuttle services whenever available.</span>
+      </div>
+
+      <div class="tip-group">In an emergency</div>
+      <div class="tip">
+        <i class="bi bi-fire text-warning"></i>
+        <span>Fire: alert others, evacuate immediately, and call <strong>101</strong> or <strong>112</strong>.</span>
+      </div>
+      <div class="tip">
+        <i class="bi bi-check-circle-fill text-success"></i>
+        <span>Memorise at least one emergency number. Do not depend only on the app.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Muster points -->
+  <div class="info-card mb-4">
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--success">
+          <i class="bi bi-people-fill"></i>
+        </span>
+        <span class="info-card__heading-text">Muster Points</span>
+      </div>
+      <p class="text-muted small mb-3">If evacuating, head to the nearest open assembly point.</p>
+      <div class="muster-grid">
+        <div class="muster-point">
+          <i class="bi bi-flag-fill text-success"></i>
+          <span class="small">Central Library Forecourt</span>
+        </div>
+        <div class="muster-point">
+          <i class="bi bi-flag-fill text-success"></i>
+          <span class="small">University Stadium</span>
+        </div>
+        <div class="muster-point">
+          <i class="bi bi-flag-fill text-success"></i>
+          <span class="small">Admin Block Quadrangle</span>
+        </div>
+        <div class="muster-point">
+          <i class="bi bi-flag-fill text-success"></i>
+          <span class="small">Guest House Lawn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Night patrol runs 10 PM to 6 AM. Status is worked out from the device clock.
+  (function () {
+    var el = document.getElementById("patrolStatus");
+    if (!el) return;
+    var h = new Date().getHours();
+    var on = h >= 22 || h < 6;
+    el.dataset.state = on ? "on" : "off";
+    el.textContent = on ? "On patrol now" : "Starts at 10 PM";
+  })();
+</script>
+{% endblock %}

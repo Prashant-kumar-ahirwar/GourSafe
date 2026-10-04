@@ -1,0 +1,2288 @@
+/* ============================================================
+   GourSafe — custom stylesheet
+  Mobile-first, theme-aware styles that supplement Bootstrap 5
+   ============================================================ */
+
+/* ── Global ── */
+:root {
+  --color-danger:  #dc2626;
+  --color-warning: #f3c969;
+  --color-success: #59c78a;
+  --color-info:    #5bc0ce;
+  --color-primary: #7ea8f8;
+  --color-dark-bg: #171a1c;
+  --color-card-bg: #212729;
+  --color-card-bg-raised: #2b3235;
+  --color-border:  #424c4f;
+  --bottom-nav-h:  64px;
+  /* readable body text on dark cards — meets WCAG AA at normal size */
+  --color-body-text: #d7dfdf;
+  --color-muted-text: #aab6b6;
+  /* headings / high-emphasis text and default body copy — these are
+     the ones that actually need to flip in light mode. Text sitting on
+     a saturated colored badge (SOS button, contact icons) is
+     deliberately NOT tied to this variable, since white-on-red should
+     stay white regardless of theme. */
+  --color-heading-text: #f4f7f7;
+  --color-text-primary: #e2e9e9;
+  /* fixed, known navbar height so the home page can calculate exactly
+     how much space is left for its "fits one screen" layout */
+  --navbar-h: 56px;
+  /* shared width cap for navbar / main content / bottom-nav, so all
+     three line up consistently on tablets and desktop instead of the
+     bars stretching edge-to-edge while content stays narrow */
+  --app-max-width: 640px;
+}
+
+/* ── Light theme ──────────────────────────────────────────────
+   Toggled via the Theme option in the profile menu (top-right), which
+   sets data-bs-theme="light" on <html> — the same attribute Bootstrap
+   5.3 itself uses, so bg-dark/text-white/border-secondary/text-bg-dark
+   utility classes flip automatically with zero extra work. This block
+   only needs to cover OUR OWN custom variables on top of that. */
+html[data-bs-theme="light"] {
+  --color-dark-bg: #f4f5f7;
+  --color-card-bg: #ffffff;
+  --color-card-bg-raised: #eceef1;
+  --color-border: #dde1e6;
+  --color-body-text: #3a3f44;
+  --color-muted-text: #5c6570;
+  --color-heading-text: #1a1a1a;
+  --color-text-primary: #1a1a1a;
+}
+
+html[data-bs-theme="light"] .bg-dark,
+html[data-bs-theme="light"] .bg-secondary,
+html[data-bs-theme="light"] .border-secondary,
+html[data-bs-theme="light"] .dropdown-menu {
+  background-color: #ffffff !important;
+  border-color: var(--color-border) !important;
+}
+
+html[data-bs-theme="light"] .text-white,
+html[data-bs-theme="light"] .text-white-50,
+html[data-bs-theme="light"] .text-white-75,
+html[data-bs-theme="light"] .page-title,
+html[data-bs-theme="light"] .page-subtitle,
+html[data-bs-theme="light"] .info-card__heading-text,
+html[data-bs-theme="light"] .campus-map-card__header,
+html[data-bs-theme="light"] .campus-marker,
+html[data-bs-theme="light"] .tile-card__label,
+html[data-bs-theme="light"] .contact-card__label,
+html[data-bs-theme="light"] .custom-contact-item__name,
+html[data-bs-theme="light"] .bottom-nav__item.active,
+html[data-bs-theme="light"] .bottom-nav__item {
+  color: var(--color-heading-text) !important;
+}
+
+html[data-bs-theme="light"] .text-white-50,
+html[data-bs-theme="light"] .text-white-75 {
+  opacity: 0.75;
+}
+
+/* Improve readability across cards, forms and menus when the site is in
+   light mode. This keeps text, borders and dividers visible instead of
+   relying only on a few narrow selectors. */
+html[data-bs-theme="light"] body,
+html[data-bs-theme="light"] .card,
+html[data-bs-theme="light"] .list-group-item,
+html[data-bs-theme="light"] .dropdown-menu,
+html[data-bs-theme="light"] .dropdown-item,
+html[data-bs-theme="light"] .input-group-text,
+html[data-bs-theme="light"] .form-control,
+html[data-bs-theme="light"] .form-select,
+html[data-bs-theme="light"] .form-check-label,
+html[data-bs-theme="light"] .table,
+html[data-bs-theme="light"] .table th,
+html[data-bs-theme="light"] .table td,
+html[data-bs-theme="light"] .modal-content,
+html[data-bs-theme="light"] .alert,
+html[data-bs-theme="light"] .btn-outline-secondary,
+html[data-bs-theme="light"] .btn-light {
+  color: var(--color-heading-text) !important;
+  background-color: var(--color-card-bg) !important;
+  border-color: var(--color-border) !important;
+}
+
+html[data-bs-theme="light"] .dropdown-item:hover,
+html[data-bs-theme="light"] .dropdown-item:focus,
+html[data-bs-theme="light"] .dropdown-item.active {
+  background-color: var(--color-card-bg-raised) !important;
+  color: var(--color-heading-text) !important;
+}
+
+html[data-bs-theme="light"] .text-muted,
+html[data-bs-theme="light"] .text-secondary,
+html[data-bs-theme="light"] .text-white-50,
+html[data-bs-theme="light"] .text-white-75 {
+  color: var(--color-muted-text) !important;
+  opacity: 1;
+}
+
+html[data-bs-theme="light"] .link-light {
+  color: #a61e2b !important;
+}
+
+html[data-bs-theme="light"] .link-light:hover,
+html[data-bs-theme="light"] .link-light:focus {
+  color: #7f1721 !important;
+}
+
+html[data-bs-theme="light"] .text-info,
+html[data-bs-theme="light"] .info-card__heading-icon--info {
+  color: #087990 !important;
+}
+
+html[data-bs-theme="light"] .text-warning,
+html[data-bs-theme="light"] .info-card__heading-icon--warning {
+  color: #805600 !important;
+}
+
+html[data-bs-theme="light"] .btn-outline-light:not(.operator-navbar .btn-outline-light) {
+  color: #a61e2b !important;
+  border-color: #a61e2b !important;
+}
+
+html[data-bs-theme="light"] .btn-outline-light:not(.operator-navbar .btn-outline-light):hover,
+html[data-bs-theme="light"] .btn-outline-light:not(.operator-navbar .btn-outline-light):focus-visible {
+  color: #ffffff !important;
+  background-color: #a61e2b !important;
+  border-color: #a61e2b !important;
+}
+
+html[data-bs-theme="light"] .bg-danger .text-white,
+html[data-bs-theme="light"] .bg-success .text-white,
+html[data-bs-theme="light"] .bg-primary .text-white {
+  color: #ffffff !important;
+}
+
+html[data-bs-theme="light"] .operator-navbar .text-white-50 {
+  color: #cbd5e1 !important;
+}
+
+html[data-bs-theme="light"] .dropdown-divider,
+html[data-bs-theme="light"] .border,
+html[data-bs-theme="light"] .border-top,
+html[data-bs-theme="light"] .border-bottom,
+html[data-bs-theme="light"] .border-start,
+html[data-bs-theme="light"] .border-end {
+  border-color: var(--color-border) !important;
+}
+
+html[data-bs-theme="light"] .form-control,
+html[data-bs-theme="light"] .form-select,
+html[data-bs-theme="light"] textarea,
+html[data-bs-theme="light"] input,
+html[data-bs-theme="light"] select {
+  background-color: var(--color-card-bg);
+  color: var(--color-heading-text);
+  border: 1px solid var(--color-border);
+}
+
+html[data-bs-theme="light"] .form-control::placeholder,
+html[data-bs-theme="light"] textarea::placeholder,
+html[data-bs-theme="light"] input::placeholder {
+  color: var(--color-muted-text);
+  opacity: 1;
+}
+
+html {
+  /* do NOT set height: 100% here — that would cap the page at viewport height
+     and prevent scrolling when dynamic content (SOS status panel) expands */
+  height: auto;
+}
+
+body {
+  background-color: var(--color-dark-bg);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  min-height: 100vh;
+  padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 1rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.home-page-no-scroll {
+  overflow: hidden;
+}
+
+html, body {
+  max-width: 100%;
+}
+
+/* ── Type scale ── */
+
+/* Page-level titles — larger, tighter tracking, heavier weight */
+.page-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Section headings within a card — slightly larger than Bootstrap fs-6 */
+.section-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1;
+}
+
+/* Page-level subtitle / lead */
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-muted-text);
+  margin-top: 0.2rem;
+}
+
+/* ── Navbar ── */
+.navbar {
+  min-height: var(--navbar-h);
+}
+
+.navbar.bg-danger {
+  background-color: #dc2626 !important;
+}
+
+.navbar-brand {
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.navbar-subtitle {
+  display: none;
+  font-size: 0.65rem;
+  opacity: 0.82;
+  letter-spacing: 0;
+}
+
+/* ── Bottom tab navigation ── */
+/* ── Profile menu button (top navbar) ── */
+.profile-btn {
+  color: #fff;
+  background: transparent;
+  border: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.profile-btn:focus {
+  box-shadow: none;
+}
+
+/* ── Shared centered container ──
+   Used by the navbar, main content, and the bottom-nav's inner wrapper
+   so all three line up at the same width. On phones this is a no-op
+   (100% is already narrower than the cap) — it only visibly kicks in
+   on tablets and desktop, which is exactly where the mismatch was. */
+.app-container {
+  max-width: var(--app-max-width, 640px);
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --app-max-width: 900px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --app-max-width: 1160px;
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --app-max-width: 1360px;
+  }
+}
+
+.desktop-nav {
+  display: none;
+}
+
+.desktop-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.4rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.desktop-nav__link:hover,
+.desktop-nav__link:focus-visible,
+.desktop-nav__link.active {
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.report-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.report-form {
+  width: 100%;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+  z-index: 1030;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav .app-container {
+  padding: 0 0.25rem;
+  height: var(--bottom-nav-h);
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex: 1;
+  text-decoration: none;
+  color: var(--color-muted-text);
+  font-size: 0.65rem;
+  padding: 0.4rem 0.25rem;
+  border-radius: 0.5rem;
+  transition: color 0.15s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav__item i {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.bottom-nav__item.active {
+  position: relative;
+  color: #dc2626;
+}
+
+.bottom-nav__item.active::before {
+  position: absolute;
+  top: 0;
+  left: 28%;
+  right: 28%;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: #dc2626;
+  content: "";
+}
+
+/* :hover is scoped to real pointer devices only (mouse/trackpad).
+   Touchscreens report `hover: none`, so this can never get "stuck" on
+   whatever tab you last tapped — which is exactly what was making two
+   tabs look highlighted at once after using the back button on mobile. */
+@media (hover: hover) and (pointer: fine) {
+  .bottom-nav__item:hover {
+    color: var(--color-heading-text);
+  }
+}
+
+.bottom-nav__item:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Emergency contact cards ── */
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: #e0e0e0;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contact-card:hover {
+    background: var(--color-card-bg-raised);
+  }
+}
+
+.contact-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.35);
+}
+
+.contact-card--red    { border-left: 4px solid var(--color-danger); }
+.contact-card--orange { border-left: 4px solid var(--color-warning); }
+.contact-card--blue   { border-left: 4px solid var(--color-primary); }
+.contact-card--teal   { border-left: 4px solid var(--color-success); }
+
+.contact-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.contact-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-card__label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-heading-text);
+}
+
+.contact-card__number {
+  font-size: 0.8rem;
+  color: var(--color-muted-text);
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.1rem;
+}
+
+.contact-card__cta {
+  font-size: 1.1rem;
+  color: var(--color-muted-text);
+  flex-shrink: 0;
+}
+
+/* ── SOS pulsing button ── */
+.sos-btn {
+  position: relative;
+  width: min(32vw, 120px);
+  height: min(32vw, 120px);
+  max-width: 120px;
+  max-height: 120px;
+  min-width: 96px;
+  min-height: 96px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease;
+  box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+  animation: sos-pulse 2s infinite;
+}
+
+.sos-btn:hover {
+  filter: brightness(1.1);
+}
+
+.sos-btn:active {
+  transform: scale(0.93);
+  animation: none;
+}
+
+.sos-btn:disabled {
+  background: #555;
+  animation: none;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.sos-btn__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.sos-btn__inner i {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.sos-btn__ring {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 3px solid rgba(220, 53, 69, 0.4);
+  animation: sos-ring 2s infinite;
+  pointer-events: none;
+}
+
+@keyframes sos-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(220, 53, 69, 0.7); }
+  70%  { box-shadow: 0 0 0 20px rgba(220, 53, 69, 0);   }
+  100% { box-shadow: 0 0 0 0   rgba(220, 53, 69, 0);   }
+}
+
+@keyframes sos-ring {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  100% { transform: scale(1.35); opacity: 0;   }
+}
+
+/* ── Home page nav tiles ── */
+.tile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.1rem 0.75rem;
+  color: #e0e0e0;
+  /* full-width inside its col-6 grid cell */
+  width: 100%;
+  min-height: 88px;
+  text-align: center;
+  transition: transform 0.1s ease, background 0.12s ease, box-shadow 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* :hover scoped to real pointer devices only — see the bottom-nav
+   comment above for why this matters on touchscreens/back-navigation */
+@media (hover: hover) and (pointer: fine) {
+  .tile-card:hover {
+    background: var(--color-card-bg-raised);
+    color: var(--color-heading-text);
+  }
+}
+
+.tile-card:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* Icon sits above the label — larger than the label text */
+.tile-card__icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  display: block;
+  /* colour is set by Bootstrap text-* utility on the element in HTML */
+}
+
+.tile-card__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ccc;
+  line-height: 1.2;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile-card:hover .tile-card__label {
+    color: var(--color-heading-text);
+  }
+}
+
+/* ── Home page: fits one screen, no vertical scrolling ──
+   Height is exactly the viewport minus the known navbar + bottom-nav
+   heights, so this works without guessing navbar content height. The
+   two direct children (top group, SOS group) get pushed to the very
+   top and very bottom via space-between — that's what moves SOS down
+   to where a thumb can reach it fastest. */
+.home-fit-screen {
+  height: calc(100dvh - var(--navbar-h) - var(--bottom-nav-h) - 1rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.55rem;
+  overflow: hidden;
+}
+
+.home-fit-screen > div:first-child,
+.home-fit-screen > .campus-map-card,
+.home-fit-screen > .d-flex.flex-column.align-items-center {
+  min-height: 0;
+  flex-shrink: 1;
+}
+
+.home-fit-screen > .d-flex.flex-column.align-items-center {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Quick-circle row — national numbers + pinned personal contacts ──
+   Wraps cleanly across rows instead of producing sideways overflow.
+   Each item is kept compact and readable on phone/tablet/desktop. */
+.quick-circle-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(58px, 1fr));
+  gap: 0.6rem 0.35rem;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+  padding: clamp(0.25rem, 1.2dvh, 0.65rem) 0 0.4rem;
+  overflow: hidden;
+}
+
+.quick-circle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.2rem;
+  width: 100%;
+  max-width: 68px;
+  margin: 0 auto;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quick-circle__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #fff;
+  background: var(--color-danger);
+  transition: transform 0.1s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.quick-circle__icon--warning { background: var(--color-warning); color: #3a2e00; }
+.quick-circle__icon--success { background: var(--color-success); }
+.quick-circle__icon--info    { background: var(--color-info); color: #04323d; }
+.quick-circle__icon--primary { background: var(--color-primary); }
+
+.quick-circle:active .quick-circle__icon {
+  transform: scale(0.92);
+}
+
+.quick-circle__name {
+  font-size: 0.58rem;
+  color: var(--color-muted-text);
+  text-align: center;
+  line-height: 1.1;
+  min-height: 2.2em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+.campus-map-card {
+  margin: 0.25rem 0 0.5rem;
+  background: rgba(14, 17, 22, 0.8);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  padding: 0.6rem 0.6rem 0.35rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  flex-shrink: 1;
+}
+
+.campus-map-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-heading-text);
+}
+
+.campus-distance-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(40, 167, 69, 0.12);
+  color: #7fe0a0;
+  font-size: 0.62rem;
+  border: 1px solid rgba(40, 167, 69, 0.4);
+}
+
+.campus-mini-map {
+  position: relative;
+  height: 120px;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(18, 24, 35, 0.9), rgba(9, 12, 16, 0.95)),
+    linear-gradient(90deg, rgba(95, 117, 91, 0.2), rgba(95, 117, 91, 0.08));
+}
+
+.campus-map__road {
+  position: absolute;
+  background: rgba(139, 155, 172, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.campus-map__road--main {
+  width: 100%;
+  height: 38%;
+  left: 0;
+  top: 31%;
+  transform: skewY(-8deg);
+}
+
+.campus-map__road--cross {
+  width: 38%;
+  height: 100%;
+  left: 31%;
+  top: 0;
+  transform: skewX(-8deg);
+}
+
+.campus-map__road--cross-2 {
+  width: 52%;
+  height: 100%;
+  left: 24%;
+  top: 0;
+  transform: skewX(12deg);
+  opacity: 0.75;
+}
+
+.campus-marker {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.18rem 0.38rem;
+  border-radius: 999px;
+  background: rgba(13, 19, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-heading-text);
+  font-size: 0.56rem;
+  white-space: nowrap;
+}
+
+.campus-marker--it { left: 55%; top: 48%; background: rgba(40, 167, 69, 0.18); }
+.campus-marker--hostel { left: 18%; top: 66%; background: rgba(13, 110, 253, 0.18); }
+.campus-marker--dept { left: 70%; top: 22%; background: rgba(255, 193, 7, 0.18); }
+.campus-marker--library { left: 32%; top: 20%; background: rgba(23, 162, 184, 0.18); }
+.campus-marker--gate { left: 12%; top: 36%; background: rgba(220, 53, 69, 0.18); }
+
+.campus-user-marker {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5b5b;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 4px rgba(255, 91, 91, 0.25);
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  display: none;
+}
+
+.campus-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+  margin-top: 0.4rem;
+  font-size: 0.58rem;
+  color: var(--color-muted-text);
+}
+
+.campus-map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+html[data-bs-theme="light"] .campus-map-card {
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(25, 35, 45, 0.08);
+}
+
+html[data-bs-theme="light"] .campus-map-card__header {
+  color: var(--color-heading-text) !important;
+}
+
+html[data-bs-theme="light"] .campus-distance-badge {
+  color: #146c43;
+  background: #e5f4eb;
+  border-color: #a8d5b8;
+}
+
+html[data-bs-theme="light"] .campus-mini-map {
+  background: linear-gradient(135deg, #e8eef2, #f5f7f8);
+  border-color: #c7d0d8;
+}
+
+html[data-bs-theme="light"] .campus-map__road {
+  background: rgba(92, 108, 122, 0.16);
+  border-color: rgba(74, 89, 103, 0.2);
+  box-shadow: none;
+}
+
+html[data-bs-theme="light"] .campus-marker {
+  color: #202832 !important;
+  border-color: rgba(50, 63, 75, 0.28);
+  box-shadow: 0 1px 3px rgba(25, 35, 45, 0.12);
+}
+
+html[data-bs-theme="light"] .campus-marker--it { background: #dff3e6; }
+html[data-bs-theme="light"] .campus-marker--hostel { background: #e5efff; }
+html[data-bs-theme="light"] .campus-marker--dept { background: #fff2cc; }
+html[data-bs-theme="light"] .campus-marker--library { background: #dff6fa; }
+html[data-bs-theme="light"] .campus-marker--gate { background: #fde5e7; }
+
+html[data-bs-theme="light"] .operator-navbar .btn-outline-light {
+  color: #f8f9fa !important;
+  border-color: rgba(248, 249, 250, 0.75) !important;
+}
+
+@media (min-width: 768px) {
+  .contact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .quick-circle-row {
+    gap: 0.7rem 0.55rem;
+  }
+
+  .quick-circle {
+    width: 72px;
+  }
+
+  .quick-circle__icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+  }
+
+  .quick-circle__name {
+    font-size: 0.62rem;
+    max-width: 68px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  body.home-page-no-scroll {
+    overflow: auto;
+  }
+
+  .home-fit-screen {
+    height: auto;
+    min-height: calc(100dvh - var(--navbar-h) - var(--bottom-nav-h) - 1.5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    justify-content: initial;
+    align-items: center;
+    gap: 1rem;
+    overflow: visible;
+  }
+
+  .home-fit-screen > div:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .home-fit-screen > .campus-map-card {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .home-fit-screen > .d-flex.flex-column.align-items-center {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .quick-circle-row {
+    grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+    gap: 0.8rem 0.35rem;
+  }
+
+  .campus-mini-map {
+    height: clamp(180px, 28vh, 260px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+    margin-right: 1.5rem;
+  }
+
+  .bottom-nav {
+    display: none;
+  }
+
+  body {
+    padding-bottom: 1.5rem;
+  }
+
+  body.home-page-no-scroll {
+    overflow: auto;
+  }
+
+  .home-fit-screen {
+    height: auto;
+    min-height: calc(100dvh - var(--navbar-h) - 1.5rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    justify-content: initial;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 2rem);
+    overflow: visible;
+  }
+
+  .home-fit-screen > div:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .home-fit-screen > .campus-map-card {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: stretch;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .home-fit-screen > .d-flex.flex-column.align-items-center {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .quick-circle-row {
+    grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+    justify-content: start;
+    gap: 1rem 0.6rem;
+  }
+
+  .quick-circle {
+    max-width: 88px;
+  }
+
+  .quick-circle__icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+  }
+
+  .campus-mini-map {
+    height: clamp(200px, 30vh, 320px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .operator-shell .operator-main {
+    max-width: 1120px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .operator-shell .operator-main {
+    max-width: 1360px;
+  }
+}
+
+@media (max-width: 360px) {
+  .quick-circle {
+    width: 56px;
+  }
+
+  .quick-circle__name {
+    max-width: 52px;
+  }
+}
+
+/* ── Personal (custom) emergency contacts — contacts.html ── */
+.custom-contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-info);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.custom-contact-item__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.custom-contact-item__name {
+  font-weight: 600;
+  color: var(--color-heading-text);
+  font-size: 0.95rem;
+}
+
+.custom-contact-item__relation {
+  font-size: 0.7rem;
+  color: var(--color-muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.custom-contact-item__phone {
+  font-size: 0.85rem;
+  color: var(--color-muted-text);
+}
+
+.custom-contact-item__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* ── Section cards (security_info, admin headings) ── */
+
+/* Shared base for all info-section cards */
+.info-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+/* Body text inside info-cards — override Bootstrap's too-dim text-muted */
+.info-card .text-muted {
+  color: var(--color-muted-text) !important;
+}
+
+/* Paragraph / span body copy inside info-cards — ensure it's readable */
+.info-card p,
+.info-card span:not([class*="text-"]):not(.info-card__heading-text),
+.info-card td {
+  color: var(--color-body-text);
+}
+
+/* table-dark inside info-cards: keep header muted, body readable */
+.info-card .table-dark td {
+  color: var(--color-body-text);
+}
+.info-card .table-dark .text-muted {
+  color: var(--color-muted-text) !important;
+}
+
+/* Coloured top bar that gives each card its own identity */
+.info-card__bar {
+  height: 4px;
+  width: 100%;
+}
+.info-card__bar--danger  { background: var(--color-danger); }
+.info-card__bar--warning { background: var(--color-warning); }
+.info-card__bar--success { background: var(--color-success); }
+.info-card__bar--info    { background: var(--color-info); }
+.info-card__bar--secondary { background: #6c757d; }
+
+.info-card__body {
+  padding: 1rem 1rem 1.1rem;
+}
+
+/* Section heading inside an info-card */
+.info-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.info-card__heading-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  color: #fff;
+}
+.info-card__heading-icon--danger  { background: rgba(220, 53, 69,  0.25); color: #ff6b6b; }
+.info-card__heading-icon--warning { background: rgba(255, 193, 7,  0.2);  color: var(--color-warning); }
+.info-card__heading-icon--success { background: rgba(25,  135, 84, 0.25); color: #5fcf8a; }
+.info-card__heading-icon--info    { background: rgba(13,  202, 240, 0.2); color: var(--color-info); }
+.info-card__heading-icon--secondary { background: rgba(108, 117, 125, 0.2); color: #adb5bd; }
+
+.info-card__heading-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #ddd;
+}
+
+/* ── Profile page ── */
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220, 53, 69, 0.14);
+  color: var(--color-danger);
+  font-size: 1.4rem;
+}
+
+.profile-guest-icon {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 193, 7, 0.16);
+  color: var(--color-warning);
+  font-size: 1.8rem;
+}
+
+.profile-meta-box {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 0.8rem 0.9rem;
+  gap: 0.25rem;
+}
+
+.profile-meta-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted-text);
+}
+
+.profile-meta-value {
+  color: var(--color-heading-text);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.profile-mini-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+}
+
+/* ── Safety guideline list ── */
+.safety-list li {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.safety-list li:last-child {
+  border-bottom: none;
+}
+
+/* Critical tips — visually elevated */
+.safety-list__group-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-text);
+  padding-top: 0.5rem;
+  padding-bottom: 0.1rem;
+  border-bottom: none !important;
+}
+
+.safety-list li.tip--critical {
+  background: rgba(220, 53, 69, 0.07);
+  border-radius: 0.35rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-bottom: 1px solid rgba(220, 53, 69, 0.18);
+}
+
+/* ── Muster point tiles ── */
+.muster-point {
+  background: var(--color-card-bg);
+  font-size: 0.8rem;
+  color: var(--color-body-text);
+  cursor: default;
+  transition: background 0.12s ease, transform 0.1s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .muster-point:hover {
+    background: var(--color-card-bg-raised);
+    color: var(--color-heading-text);
+  }
+}
+
+.muster-point:active {
+  transform: scale(0.96);
+}
+
+/* ── Admin section headers ── */
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-section-header--warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 3px solid var(--color-warning);
+}
+
+.admin-section-header--danger {
+  background: rgba(220, 53, 69, 0.1);
+  border-left: 3px solid var(--color-danger);
+}
+
+.admin-section-header--success {
+  background: rgba(25, 135, 84, 0.1);
+  border-left: 3px solid var(--color-success);
+}
+
+.admin-section-header--info {
+  background: rgba(13, 202, 240, 0.1);
+  border-left: 3px solid var(--color-info);
+}
+
+.admin-section-header__title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex: 1;
+}
+
+/* ── Admin table ── */
+.report-desc {
+  max-width: 260px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Form overrides (dark inputs) ── */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* ============================================================
+   Operator Console — second interface, staff-only
+   Deliberately distinct from the student theme above: slate/blue
+   instead of red, so it never gets mistaken for the public app.
+   ============================================================ */
+
+.operator-shell {
+  /* same dark canvas as the student app, but no bottom-nav padding
+     since the operator console has no bottom tab bar */
+  padding-bottom: 1.5rem;
+}
+
+.operator-main {
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+.operator-navbar {
+  background: #20292c;
+  border-bottom: 1px solid #394548;
+}
+
+/* ── Login card ── */
+.login-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  padding: 1.75rem 1.5rem;
+  margin-top: 2rem;
+}
+
+.login-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(13, 110, 253, 0.18);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Red variant for the student-facing auth pages (welcome/signup/login/
+   profile-setup), so they match the student app's red theme instead of
+   the operator console's blue — same shape, different accent color. */
+.login-card__icon--danger {
+  background: rgba(220, 53, 69, 0.18);
+  color: var(--color-danger);
+}
+
+/* ── Auto-refresh toggle ── */
+.auto-refresh-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--color-muted-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.auto-refresh-toggle input {
+  cursor: pointer;
+}
+
+/* ── Summary stat cards ── */
+.stat-card {
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid transparent;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+}
+
+.stat-card--danger  { border-left-color: var(--color-danger); }
+.stat-card--warning { border-left-color: var(--color-warning); }
+
+.stat-card__value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-heading-text);
+  line-height: 1;
+}
+
+.stat-card__label {
+  font-size: 0.7rem;
+  color: var(--color-muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.3rem;
+}
+
+/* ── Status badges (reports + SOS alerts) ── */
+.status-badge--active,
+.status-badge--new {
+  background: rgba(220, 53, 69, 0.2);
+  color: #ff8a8a;
+}
+
+.status-badge--acknowledged {
+  background: rgba(255, 193, 7, 0.2);
+  color: var(--color-warning);
+}
+
+.status-badge--handled,
+.status-badge--resolved {
+  background: rgba(25, 135, 84, 0.2);
+  color: #5fcf8a;
+}
+
+html[data-bs-theme="light"] .status-badge--active,
+html[data-bs-theme="light"] .status-badge--new {
+  background: #fce8ea;
+  color: #9b1c27;
+}
+
+html[data-bs-theme="light"] .status-badge--acknowledged {
+  background: #fff4d1;
+  color: #755000;
+}
+
+html[data-bs-theme="light"] .status-badge--handled,
+html[data-bs-theme="light"] .status-badge--resolved {
+  background: #e1f3e8;
+  color: #176b3a;
+}
+
+.status-select {
+  width: auto;
+  font-size: 0.75rem;
+  padding: 0.15rem 1.6rem 0.15rem 0.5rem;
+  background-color: var(--color-card-bg-raised);
+  color: var(--color-heading-text);
+  border-color: var(--color-border);
+}
+
+/* Subtly highlight rows that still need action */
+tr.table-alert-active {
+  box-shadow: inset 3px 0 0 var(--color-danger);
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
+  .sos-btn {
+    width: 150px;
+    height: 150px;
+    font-size: 1.2rem;
+  }
+  .sos-btn__inner i {
+    font-size: 2rem;
+  }
+  .tile-card {
+    min-height: 76px;
+    padding: 0.85rem 0.5rem;
+  }
+  .tile-card__icon {
+    font-size: 1.35rem;
+  }
+}
+
+/* ── GourSafe emergency dashboard ── */
+.home-dashboard {
+  display: grid;
+  grid-template-areas:
+    "actions"
+    "map"
+    "sos";
+  gap: 1.1rem;
+  padding: 1rem 0;
+}
+
+.home-map { grid-area: map; }
+.home-actions { grid-area: actions; min-width: 0; }
+.home-sos { grid-area: sos; }
+
+.campus-map-card.home-map {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin: 0;
+  border-radius: 0.85rem;
+  background: var(--color-card-bg);
+  box-shadow: 0 8px 28px rgba(19, 31, 45, 0.08);
+}
+
+.campus-map-card__header {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.campus-map-card__title {
+  margin: 0 0 0.45rem;
+  color: var(--color-heading-text);
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.campus-distance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 30px;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.campus-distance-badge__dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.campus-distance-badge[data-state="checking"] .campus-distance-badge__dot {
+  color: #b7791f;
+  animation: gps-pulse 1.4s ease-in-out infinite;
+}
+
+.campus-distance-badge[data-state="live"] {
+  color: #166534;
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.campus-distance-badge[data-state="live"] .campus-distance-badge__dot {
+  color: #16a34a;
+  animation: gps-pulse 1.8s ease-in-out infinite;
+}
+
+.campus-distance-badge[data-state="outside-range"],
+.campus-distance-badge[data-state="unavailable"] {
+  color: #991b1b;
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.map-expand-btn {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  color: var(--color-heading-text);
+  background: var(--color-card-bg);
+  font-size: 1rem;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.map-expand-btn:hover {
+  background: var(--color-card-bg-raised);
+}
+
+.map-expand-btn:active {
+  transform: scale(0.96);
+}
+
+.campus-mini-map {
+  flex: 1 1 auto;
+  min-height: 245px;
+  height: clamp(245px, 42vw, 420px);
+  border-color: #cbd5e1;
+  background-color: #eaf0eb;
+  background-image:
+    linear-gradient(27deg, transparent 47%, rgba(255, 255, 255, 0.82) 48%, rgba(255, 255, 255, 0.82) 52%, transparent 53%),
+    linear-gradient(145deg, transparent 44%, rgba(255, 255, 255, 0.72) 45%, rgba(255, 255, 255, 0.72) 49%, transparent 50%),
+    linear-gradient(90deg, #e7efe5, #edf2e8 48%, #e4eee6);
+}
+
+.campus-mini-map.leaflet-container {
+  font: inherit;
+  background: #e7efe5;
+}
+
+.campus-poi-marker {
+  border: 0;
+  background: transparent;
+}
+
+.campus-poi-marker__pin {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 3px solid #ffffff;
+  border-radius: 50% 50% 50% 0;
+  color: #ffffff;
+  background: #dc2626;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.3);
+  font-size: 0.85rem;
+  transform: rotate(-45deg);
+}
+
+.campus-poi-marker__pin i {
+  transform: rotate(45deg);
+}
+
+.campus-poi-marker__pin--department { background: #2563eb; }
+.campus-poi-marker__pin--library { background: #0e7490; }
+.campus-poi-marker__pin--hostel { background: #7c3aed; }
+
+.leaflet-tooltip.campus-place-tooltip {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.4rem;
+  color: #1f2937;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.leaflet-control-zoom a {
+  color: #1f2937 !important;
+}
+
+.leaflet-control-attribution {
+  font-size: 0.65rem !important;
+}
+
+.map-unavailable {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  background: rgba(249, 250, 251, 0.94);
+  color: #334155;
+  text-align: center;
+}
+
+.map-unavailable > i {
+  color: #dc2626;
+  font-size: 2rem;
+}
+
+.map-unavailable a {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.campus-map__park {
+  position: absolute;
+  border: 1px solid rgba(58, 115, 78, 0.16);
+  border-radius: 30% 42% 35% 28%;
+  background: rgba(133, 181, 132, 0.28);
+}
+
+.campus-map__park--one {
+  top: 10%;
+  right: 8%;
+  width: 23%;
+  height: 22%;
+}
+
+.campus-map__park--two {
+  bottom: 7%;
+  left: 9%;
+  width: 25%;
+  height: 20%;
+}
+
+.campus-map__road {
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(143, 157, 146, 0.55);
+  box-shadow: 0 1px 4px rgba(61, 75, 65, 0.08);
+}
+
+.campus-marker {
+  z-index: 2;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(51, 65, 85, 0.16);
+  background: #ffffff;
+  color: #1f2937;
+  box-shadow: 0 2px 8px rgba(31, 41, 55, 0.13);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.campus-marker--it { background: #dcfce7; }
+.campus-marker--hostel { background: #dbeafe; }
+.campus-marker--library { background: #fef3c7; }
+.campus-marker--gate { background: #fee2e2; }
+
+.campus-user-marker {
+  z-index: 3;
+  width: 16px;
+  height: 16px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #ffffff;
+  background: #dc2626;
+  box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.2), 0 2px 8px rgba(15, 23, 42, 0.2);
+}
+
+.campus-user-marker span {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 750;
+  transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+}
+
+.campus-map-legend {
+  gap: 0.65rem 1.1rem;
+  margin: 0;
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+.campus-map-legend span {
+  gap: 0.35rem;
+}
+
+.home-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.home-section-heading h2,
+.home-sos__copy h2 {
+  margin: 0;
+  color: var(--color-heading-text);
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.home-section-heading > i {
+  color: #dc2626;
+  font-size: 1.2rem;
+}
+
+.home-eyebrow {
+  margin: 0 0 0.15rem;
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.quick-circle-row {
+  display: flex;
+  gap: 0.55rem;
+  width: auto;
+  max-width: none;
+  margin-inline: -0.25rem;
+  padding: 0.25rem 0.25rem 0.65rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+
+.quick-circle {
+  width: auto;
+  max-width: none;
+  min-width: max-content;
+  min-height: 52px;
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-card-bg);
+  color: var(--color-heading-text);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  scroll-snap-align: start;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.quick-circle:hover,
+.quick-circle:focus-visible {
+  color: var(--color-heading-text);
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+}
+
+.quick-circle:active {
+  transform: scale(0.98);
+}
+
+.quick-circle__icon {
+  width: 32px;
+  height: 32px;
+  font-size: 0.9rem;
+  background: #dc2626;
+}
+
+.quick-circle__icon--primary { background: #1d4ed8; }
+.quick-circle__icon--warning { background: #facc15; color: #422006; }
+.quick-circle__icon--success { background: #15803d; }
+.quick-circle__icon--info { background: #0e7490; color: #ffffff; }
+.quick-circle--pin .quick-circle__icon { background: #475569; }
+
+.quick-circle__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+}
+
+.quick-circle__name {
+  min-height: auto;
+  max-width: none;
+  color: var(--color-heading-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.quick-circle__detail {
+  color: #64748b;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.home-sos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.85rem;
+  background: var(--color-card-bg);
+  box-shadow: 0 8px 28px rgba(19, 31, 45, 0.07);
+  text-align: center;
+}
+
+.home-sos__copy p:last-child {
+  margin: 0.35rem 0 0;
+  color: #475569;
+  font-size: 0.85rem;
+}
+
+.sos-btn {
+  width: 168px;
+  height: 168px;
+  max-width: none;
+  max-height: none;
+  min-width: 168px;
+  min-height: 168px;
+  margin: 0.25rem 0 0.5rem;
+  background: #dc2626;
+  box-shadow: 0 10px 30px rgba(220, 38, 38, 0.25);
+  animation: none;
+  touch-action: none;
+  user-select: none;
+}
+
+.sos-btn:hover:not(:disabled) {
+  filter: brightness(1.04);
+  box-shadow: 0 12px 36px rgba(220, 38, 38, 0.32);
+}
+
+.sos-btn:disabled {
+  background: #b8c0cc;
+  box-shadow: none;
+}
+
+.sos-btn__ring {
+  inset: -11px;
+  border: 2px solid rgba(220, 38, 38, 0.32);
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+
+.sos-btn__hold-progress {
+  position: absolute;
+  inset: -9px;
+  z-index: 2;
+  border-radius: 50%;
+  background: conic-gradient(#ffffff var(--hold-progress, 0%), rgba(255, 255, 255, 0.32) 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sos-btn.is-holding .sos-btn__hold-progress { opacity: 1; }
+.sos-btn.is-holding { transform: scale(0.96); }
+
+.sos-btn__inner {
+  gap: 0.12rem;
+}
+
+.sos-btn__inner i {
+  font-size: 2.2rem;
+}
+
+.sos-btn__hold-label {
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.sos-status {
+  max-width: 520px;
+}
+
+.map-open {
+  overflow: hidden !important;
+}
+
+.campus-map-card.is-expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  border: 0;
+  border-radius: 0;
+}
+
+.campus-map-card.is-expanded .campus-mini-map {
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.94); opacity: 0.75; }
+  75%, 100% { transform: scale(1.12); opacity: 0; }
+}
+
+@keyframes gps-pulse {
+  50% { opacity: 0.45; transform: scale(0.82); }
+}
+
+@media (min-width: 640px) {
+  .home-dashboard {
+    gap: 1.35rem;
+    padding-top: 1.35rem;
+  }
+
+  .quick-circle-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .quick-circle {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .quick-circle__name {
+    white-space: normal;
+  }
+}
+
+@media (min-width: 1024px) {
+  .navbar-subtitle {
+    display: block !important;
+  }
+
+  .home-dashboard {
+    grid-template-columns: minmax(0, 65fr) minmax(320px, 35fr);
+    grid-template-rows: minmax(250px, 0.8fr) minmax(320px, 1.2fr);
+    grid-template-areas:
+      "map actions"
+      "map sos";
+    align-items: stretch;
+    gap: 1.25rem;
+    min-height: calc(100dvh - var(--navbar-h) - 2rem);
+    padding: 1.25rem 0;
+  }
+
+  .campus-map-card.home-map {
+    min-height: 620px;
+  }
+
+  .campus-mini-map {
+    height: auto;
+    min-height: 420px;
+  }
+
+  .home-actions {
+    align-self: start;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    background: var(--color-card-bg);
+    box-shadow: 0 8px 28px rgba(19, 31, 45, 0.06);
+  }
+
+  .quick-circle-row {
+    gap: 0.65rem;
+  }
+
+  .home-sos {
+    position: sticky;
+    bottom: 1.25rem;
+    align-self: end;
+    justify-content: center;
+    min-height: 320px;
+  }
+
+  .sos-btn {
+    width: clamp(184px, 16vw, 228px);
+    height: clamp(184px, 16vw, 228px);
+    min-width: clamp(184px, 16vw, 228px);
+    min-height: clamp(184px, 16vw, 228px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campus-distance-badge__dot,
+  .sos-btn__ring {
+    animation: none;
+  }
+
+  .quick-circle,
+  .map-expand-btn,
+  .sos-btn {
+    transition: none;
+  }
+}
+
+
+/* ============================================================
+   Android app / WebView stability
+   - overscroll-behavior: stops the "rubber band / stretch" at the top and
+     bottom of a long page, which made the sticky navbar and fixed bottom
+     bar look like they were moving while scrolling.
+   - translateZ(0): keeps both bars on their own GPU layer so the WebView
+     does not repaint them while the page scrolls underneath.
+   ============================================================ */
+html,
+body {
+  overscroll-behavior: none;
+}
+
+.navbar.sticky-top,
+.bottom-nav {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ============================================================
+   Campus Security page (templates/security_info.html)
+   Scoped under .security-page so no other page is affected.
+   ============================================================ */
+.security-page {
+  /* nothing may ever be wider than the screen */
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.security-page .sec-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.security-page .sec-actions .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 46px;
+  font-weight: 700;
+  border-radius: 0.7rem;
+}
+
+/* Security office: label + value rows */
+.security-page .sec-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.security-page .sec-line > i {
+  flex: 0 0 1.2rem;
+  margin-top: 0.15rem;
+  text-align: center;
+}
+
+.security-page .sec-line__title {
+  font-weight: 700;
+  color: var(--color-heading-text, inherit);
+}
+
+/* Hours: name on the left, time pill on the right */
+.security-page .sec-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.92rem;
+}
+
+.security-page .sec-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.security-page .sec-row__time {
+  flex: 0 0 auto;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Guidance: icon column + text column (text no longer wraps under the icon) */
+.security-page .tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.security-page .tip > i {
+  flex: 0 0 1.1rem;
+  margin-top: 0.15rem;
+  text-align: center;
+}
+
+.security-page .tip:last-child {
+  border-bottom: none;
+}
+
+.security-page .tip--critical {
+  background: rgba(220, 53, 69, 0.07);
+  border-radius: 0.5rem;
+  border-bottom-color: transparent;
+  margin-bottom: 0.25rem;
+}
+
+.security-page .tip-group {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-text);
+  padding: 0.9rem 0.5rem 0.2rem;
+}
+
+.security-page .tip-group:first-child {
+  padding-top: 0;
+}
+
+/* Muster points: equal tiles in a 2 x 2 grid */
+.security-page .muster-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.security-page .muster-point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-height: 78px;
+  padding: 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.7rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.security-page .muster-point > i {
+  font-size: 1.15rem;
+}
+
+
+/* ============================================================
+   Security page: vertical scrolling must always work
+   Android WebView stops scrolling when html AND body both get an
+   overflow value, or when touch-action is restricted on them. So the
+   page-level rules are reset here, and sideways overflow is prevented
+   with overflow-x: clip, which (unlike hidden) does not turn the
+   element into a scroll container.
+   ============================================================ */
+html:has(.security-page),
+html:has(.security-page) body {
+  overflow: visible;
+  overflow-x: clip;
+  height: auto;
+  max-width: 100%;
+  touch-action: auto;
+  overscroll-behavior-y: auto;
+}
+
+.security-page,
+.security-page * {
+  min-width: 0;            /* flex/grid children may shrink instead of pushing wide */
+  box-sizing: border-box;
+}
+
+.security-page {
+  width: 100%;
+  overflow-x: clip;
+}
+
+.security-page img,
+.security-page table,
+.security-page iframe {
+  max-width: 100%;
+}
+
+/* Patrol status pill (below the hours) */
+.security-page .patrol-pill {
+  flex: 0 0 auto;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid var(--color-border);
+  color: var(--color-muted-text);
+}
+
+.security-page .patrol-pill[data-state="on"] {
+  background: rgba(13, 202, 240, 0.15);
+  border-color: rgba(13, 202, 240, 0.5);
+  color: #0a7f95;
+}

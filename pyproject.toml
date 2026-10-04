@@ -1,0 +1,26 @@
+# Python project metadata for GourSafe web app.
+# The requires-python constraint below documents that this app targets Python 3.11.
+# Note: Vercel's @vercel/python builder reads its version from vercel.json
+# (builds[].config.runtime = "python3.11"), which is set alongside this file.
+
+[project]
+name = "goursafe-web"
+version = "1.0.0"
+description = "GourSafe campus safety PWA (Flask + Supabase Postgres)"
+requires-python = ">=3.11"
+dependencies = [
+    "flask==3.0.3",
+    "gunicorn==22.0.0",
+    "psycopg[binary]==3.3.6",
+    "python-dotenv==1.0.1",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# This is a Flask app, not a distributable library. Disable setuptools'
+# automatic package discovery so it does not try to bundle top-level folders
+# like static/ and templates/ into a wheel (which caused the build to fail).
+[tool.setuptools]
+packages = []

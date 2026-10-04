@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block extra_styles %}
+<!-- Open the connections to the map servers early -->
+<link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin />
+<link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin />
+<link rel="dns-prefetch" href="https://c.tile.openstreetmap.org" />
+<!-- jsDelivr is already used for Bootstrap, so no extra connection is needed (same files, same SRI hashes) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+{% endblock %}
+
+{% block content %}
+<div class="home-dashboard">
+  <section class="home-map campus-map-card" aria-labelledby="campusMapTitle">
+    <div class="campus-map-card__header">
+      <div>
+        <h1 id="campusMapTitle" class="campus-map-card__title">Campus Safety Map</h1>
+        <span id="campusDistanceBadge" class="campus-distance-badge" data-state="checking" role="status" aria-live="polite">
+          <span class="campus-distance-badge__dot" aria-hidden="true"></span>
+          <span id="campusDistanceText">Checking location...</span>
+        </span>
+      </div>
+      <button id="mapExpandBtn" type="button" class="map-expand-btn" aria-label="Expand campus map" title="Expand map">
+        <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div id="campusMiniMap" class="campus-mini-map" role="region" aria-label="Interactive OpenStreetMap of Dr. Hari Singh Gour University">
+      <div id="mapUnavailable" class="map-unavailable d-none">
+        <i class="bi bi-map" aria-hidden="true"></i>
+        <span>The map could not be loaded.</span>
+        <a href="https://www.openstreetmap.org/?mlat=23.8269023&amp;mlon=78.7711252#map=16/23.8269023/78.7711252" target="_blank" rel="noopener noreferrer">Open campus map</a>
+      </div>
+    </div>
+
+    <div class="campus-map-legend" aria-label="Map legend">
+      <span><i class="bi bi-geo-alt-fill text-danger" aria-hidden="true"></i>You</span>
+      <span><i class="bi bi-building-fill legend-campus" aria-hidden="true"></i>Valley Campus</span>
+      <span><i class="bi bi-mortarboard-fill legend-department" aria-hidden="true"></i>Departments</span>
+      <span><i class="bi bi-book-half legend-library" aria-hidden="true"></i>Library</span>
+      <span><i class="bi bi-house-heart-fill legend-hostel" aria-hidden="true"></i>Girls hostel</span>
+      <span><i class="bi bi-geo-alt-fill legend-user" aria-hidden="true"></i>Your location</span>
+    </div>
+  </section>
+
+  <section class="home-actions" aria-labelledby="quickActionsTitle">
+    <div class="home-section-heading">
+      <div>
+        <p class="home-eyebrow">Fast access</p>
+        <h2 id="quickActionsTitle">Emergency Quick Actions</h2>
+      </div>
+      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+    </div>
+
+    <div class="quick-circle-row">
+      <a href="tel:112" class="quick-circle quick-circle--emergency">
+        <span class="quick-circle__icon"><i class="bi bi-shield-fill-exclamation" aria-hidden="true"></i></span>
+        <span class="quick-circle__text"><span class="quick-circle__name">All Emergencies</span><span class="quick-circle__detail">112</span></span>
+      </a>
+      <a href="tel:100" class="quick-circle">
+        <span class="quick-circle__icon quick-circle__icon--primary"><i class="bi bi-patch-check-fill" aria-hidden="true"></i></span>
+        <span class="quick-circle__text"><span class="quick-circle__name">Police</span><span class="quick-circle__detail">100</span></span>
+      </a>
+      <a href="tel:108" class="quick-circle">
+        <span class="quick-circle__icon"><i class="bi bi-heart-pulse-fill" aria-hidden="true"></i></span>
+        <span class="quick-circle__text"><span class="quick-circle__name">Ambulance</span><span class="quick-circle__detail">108</span></span>
+      </a>
+      <a href="tel:101" class="quick-circle">
+        <span class="quick-circle__icon quick-circle__icon--warning"><i class="bi bi-fire" aria-hidden="true"></i></span>
+        <span class="quick-circle__text"><span class="quick-circle__name">Fire</span><span class="quick-circle__detail">101</span></span>
+      </a>
+      <a href="tel:1091" class="quick-circle">
+        <span class="quick-circle__icon quick-circle__icon--success"><i class="bi bi-gender-female" aria-hidden="true"></i></span>
+        <span class="quick-circle__text"><span class="quick-circle__name">Women's Helpline</span><span class="quick-circle__detail">1091</span></span>
+      </a>
+      {% for c in pinned_contacts %}
+      <a href="tel:{{ c['phone'] }}" class="quick-circle">
+        <span class="quick-circle__icon quick-circle__icon--info"><i class="bi bi-person-fill" aria-hidden="true"></i></span>
+        <span class="quick-circle__text"><span class="quick-circle__name">{{ c['name'] }}</span><span class="quick-circle__detail">{{ c['phone'] }}</span></span>
+      </a>
+      {% endfor %}
+      <a href="{{ url_for('contacts') }}" class="quick-circle quick-circle--pin">
+        <span class="quick-circle__icon"><i class="bi bi-star-fill" aria-hidden="true"></i></span>
+        <span class="quick-circle__text"><span class="quick-circle__name">Pin Contact</span><span class="quick-circle__detail">Personal</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="home-sos" aria-labelledby="sosTitle">
+    <div class="home-sos__copy">
+      <p class="home-eyebrow">Campus emergency response</p>
+      <h2 id="sosTitle">Need help now?</h2>
+      <p>In immediate danger? Press and hold SOS for 2 seconds.</p>
+    </div>
+
+    <button id="sosBtn" type="button" class="sos-btn" aria-label="Press and hold for 2 seconds to send SOS" aria-describedby="sosTitle">
+      <span class="sos-btn__ring" aria-hidden="true"></span>
+      <span class="sos-btn__hold-progress" aria-hidden="true"></span>
+      <span class="sos-btn__inner">
+        <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+        <span>SOS</span>
+        <span class="sos-btn__hold-label">Hold 2 sec</span>
+      </span>
+    </button>
+
+    <div id="statusPanel" class="sos-status w-100 d-none" aria-live="polite">
+      <div id="stateLocating" class="d-none text-center py-2">
+        <div class="spinner-border spinner-border-sm text-danger me-2" role="status" aria-hidden="true"></div>
+        <span class="small">Getting your location...</span>
+      </div>
+      <div id="stateSending" class="d-none text-center py-2">
+        <div class="spinner-border spinner-border-sm text-warning me-2" role="status" aria-hidden="true"></div>
+        <span class="small">Sending to security...</span>
+      </div>
+      <div id="stateTimer" class="d-none">
+        <div class="alert alert-warning d-flex align-items-start gap-2 py-2 mb-0" role="alert">
+          <i class="bi bi-stopwatch-fill flex-shrink-0 mt-1" aria-hidden="true"></i>
+          <div>
+            <strong>Response in progress.</strong>
+            <div class="mt-1 small">Security team status: <span id="countdownValue">00:30</span></div>
+            <div class="mt-1 small text-muted">The campus safety cell will reach you shortly.</div>
+          </div>
+        </div>
+      </div>
+      <div id="stateSuccess" class="d-none">
+        <div class="alert alert-success d-flex align-items-start gap-2 py-2 mb-0" role="alert">
+          <i class="bi bi-check-circle-fill flex-shrink-0 mt-1" aria-hidden="true"></i>
+          <div>
+            <strong>Location sent.</strong> The campus safety cell has received your SOS.
+            <div class="mt-1 small"><span id="outLat"></span>, <span id="outLon"></span> (±<span id="outAcc"></span> m)</div>
+          </div>
+        </div>
+      </div>
+      <div id="stateError" class="d-none">
+        <div class="alert alert-danger d-flex align-items-start gap-2 py-2 mb-0" role="alert">
+          <i class="bi bi-x-circle-fill flex-shrink-0 mt-1" aria-hidden="true"></i>
+          <div><strong>Emergency service unavailable.</strong> <span id="errorMsg"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+{% endblock %}

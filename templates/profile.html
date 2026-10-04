@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h1 class="page-title text-danger mb-1">
+    <i class="bi bi-person-circle me-2"></i>My Profile
+  </h1>
+  <p class="page-subtitle mb-0">Your account and emergency information.</p>
+</div>
+
+{% if guest %}
+  <div class="info-card mb-3">
+    <div class="info-card__bar info-card__bar--warning"></div>
+    <div class="info-card__body text-center">
+      <div class="profile-guest-icon mx-auto mb-3">
+        <i class="bi bi-person-badge-fill"></i>
+      </div>
+      <h2 class="h5 fw-bold text-white mb-2">Guest mode</h2>
+      <p class="text-muted small mb-3">
+        You are browsing without a saved account. Sign in to keep your emergency details, or create an account to save your profile.
+      </p>
+      <div class="d-grid gap-2">
+        <a href="{{ url_for('login') }}" class="btn btn-danger fw-bold">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+        </a>
+        <a href="{{ url_for('signup') }}" class="btn btn-outline-light fw-bold">
+          <i class="bi bi-person-plus-fill me-2"></i>Create Account
+        </a>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="info-card mb-3">
+    <div class="info-card__bar info-card__bar--danger"></div>
+    <div class="info-card__body">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="profile-avatar">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div>
+          <div class="fw-bold text-white h5 mb-1">{{ user['name'] }}</div>
+          <div class="text-muted small">{{ user['email'] }}</div>
+        </div>
+      </div>
+
+      <div class="row g-2">
+        <div class="col-12 col-md-6">
+          <div class="profile-meta-box">
+            <span class="profile-meta-label">Phone</span>
+            <span class="profile-meta-value">{{ user['phone'] or 'Not added yet' }}</span>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="profile-meta-box">
+            <span class="profile-meta-label">Account</span>
+            <span class="profile-meta-value">Saved profile</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card mb-3">
+    <div class="info-card__bar info-card__bar--info"></div>
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--info">
+          <i class="bi bi-people-fill"></i>
+        </span>
+        <span class="info-card__heading-text">Emergency Contact</span>
+      </div>
+
+      {% if user['emergency_contact_name'] and user['emergency_contact_phone'] %}
+        <div class="profile-meta-box mb-2">
+          <span class="profile-meta-label">Name</span>
+          <span class="profile-meta-value">{{ user['emergency_contact_name'] }}</span>
+        </div>
+        <div class="profile-meta-box">
+          <span class="profile-meta-label">Phone</span>
+          <span class="profile-meta-value">{{ user['emergency_contact_phone'] }}</span>
+        </div>
+      {% else %}
+        <div class="alert alert-warning py-2 mb-0 small" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          No emergency contact saved yet.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="info-card mb-3">
+    <div class="info-card__body">
+      <div class="info-card__heading">
+        <span class="info-card__heading-icon info-card__heading-icon--success">
+          <i class="bi bi-bookmark-star-fill"></i>
+        </span>
+        <span class="info-card__heading-text">Saved Contacts</span>
+      </div>
+
+      {% if custom_contacts %}
+        <div class="d-flex flex-column gap-2">
+          {% for contact in custom_contacts %}
+            <div class="profile-mini-contact">
+              <div>
+                <div class="fw-semibold text-white small">{{ contact['name'] }}</div>
+                <div class="text-muted small">{{ contact['relation'] or 'Contact' }}</div>
+              </div>
+              <a href="tel:{{ contact['phone'] }}" class="btn btn-sm btn-outline-light px-2 py-1">
+                <i class="bi bi-telephone-fill"></i>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-muted small mb-0">No custom contacts saved yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <a href="{{ url_for('edit_profile') }}" class="btn btn-danger w-100 fw-bold py-2">
+    <i class="bi bi-pencil-square me-2"></i>Edit Profile
+  </a>
+{% endif %}
+{% endblock %}
