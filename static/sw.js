@@ -9,7 +9,7 @@
        be fresh; never serve a cached SOS response).
    ============================================================ */
 
-const CACHE_VERSION = 'goursafe-v10';
+const CACHE_VERSION = 'goursafe-v12';
 const OFFLINE_URL   = '/offline';
 
 /* Map tiles (OpenStreetMap) are cached separately so repeat visits to the
@@ -79,6 +79,18 @@ self.addEventListener('fetch', event => {
   // 1b. Map tiles: cache-first (they almost never change)
   if (/^[abc]\.tile\.openstreetmap\.org$/.test(url.hostname)) {
     event.respondWith(tileStrategy(request));
+    return;
+  }
+
+  // 1b2. Operator console: always live from the server, never from the cache
+  if (url.origin === self.location.origin && url.pathname.startsWith('/operator')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // 1c. "My Reports" shows live status set by security: network first, cache only when offline
+  if (url.origin === self.location.origin && url.pathname === '/my-reports') {
+    event.respondWith(fetch(request).catch(() => caches.match(request).then(r => r || caches.match(OFFLINE_URL))));
     return;
   }
 

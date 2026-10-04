@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}My Reports{% endblock %}
+
+{% block content %}
+<div class="my-reports-page">
+  <div class="mb-3">
+    <h1 class="page-title text-danger mb-1">
+      <i class="bi bi-clipboard2-pulse-fill me-2"></i>My Reports
+    </h1>
+    <p class="page-subtitle mb-0">Your reports and SOS alerts, and what security has done about them.</p>
+  </div>
+
+  {% if guest %}
+    <div class="info-card mb-3">
+      <div class="info-card__bar info-card__bar--warning"></div>
+      <div class="info-card__body text-center">
+        <p class="text-muted small mb-3">
+          Sign in to keep a record of your reports and SOS alerts. Guest activity is not saved to an account.
+        </p>
+        <div class="d-grid gap-2">
+          <a href="{{ url_for('login') }}" class="btn btn-danger fw-bold">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+          </a>
+          <a href="{{ url_for('signup') }}" class="btn btn-outline-light fw-bold">
+            <i class="bi bi-person-plus-fill me-2"></i>Create Account
+          </a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-secondary py-2 small mb-3" role="note">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      Status is updated only by campus security (operator). You can see it here but not change it.
+    </div>
+
+    <!-- SOS alerts -->
+    <div class="info-card mb-3">
+      <div class="info-card__bar info-card__bar--danger"></div>
+      <div class="info-card__body">
+        <div class="info-card__heading">
+          <span class="info-card__heading-icon info-card__heading-icon--danger">
+            <i class="bi bi-broadcast-pin"></i>
+          </span>
+          <span class="info-card__heading-text">SOS Alerts</span>
+          <span class="badge bg-danger ms-auto">{{ sos_alerts | length }}</span>
+        </div>
+
+        {% for a in sos_alerts %}
+          <div class="mr-item">
+            <div class="mr-item__top">
+              <span class="fw-semibold">SOS #{{ a['id'] }}</span>
+              {% if a['status'] == 'active' %}
+                <span class="badge bg-danger">Active &ndash; help requested</span>
+              {% else %}
+                <span class="badge bg-success">Handled</span>
+              {% endif %}
+            </div>
+            <div class="text-muted small">{{ a['created_at'] | ist }}</div>
+            <a class="small" target="_blank" rel="noopener"
+               href="https://www.openstreetmap.org/?mlat={{ a['latitude'] }}&amp;mlon={{ a['longitude'] }}#map=18/{{ a['latitude'] }}/{{ a['longitude'] }}">
+              <i class="bi bi-geo-alt-fill me-1"></i>View sent location
+            </a>
+          </div>
+        {% else %}
+          <div class="text-muted small">No SOS alerts sent from this account.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Reports -->
+    <div class="info-card mb-3">
+      <div class="info-card__bar info-card__bar--warning"></div>
+      <div class="info-card__body">
+        <div class="info-card__heading">
+          <span class="info-card__heading-icon info-card__heading-icon--warning">
+            <i class="bi bi-flag-fill"></i>
+          </span>
+          <span class="info-card__heading-text">Incident Reports</span>
+          <span class="badge bg-warning text-dark ms-auto">{{ reports | length }}</span>
+        </div>
+
+        {% for r in reports %}
+          <div class="mr-item">
+            <div class="mr-item__top">
+              <span class="fw-semibold">{{ r['category'] }}</span>
+              {% if r['status'] == 'resolved' %}
+                <span class="badge bg-success">Resolved</span>
+              {% elif r['status'] == 'acknowledged' %}
+                <span class="badge bg-info text-dark">Seen by security</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Submitted</span>
+              {% endif %}
+            </div>
+            <div class="text-muted small">{{ r['created_at'] | ist }}</div>
+            <div class="small mt-1 mr-item__text">{{ r['description'] }}</div>
+          </div>
+        {% else %}
+          <div class="text-muted small">You have not submitted any reports yet.</div>
+        {% endfor %}
+
+        <a href="{{ url_for('report') }}" class="btn btn-outline-light btn-sm mt-3 fw-bold">
+          <i class="bi bi-plus-circle-fill me-2"></i>New report
+        </a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

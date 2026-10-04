@@ -59,6 +59,18 @@ complete it once; guests skip that step entirely.
 
 ---
 
+## Operator Login � Default Credentials
+
+**Local development only** � the app falls back to these if no
+environment variables are set:
+
+- Username: `operator`
+- Password: `GourSafe@2026`
+
+**Change this before deploying anywhere real.** In Vercel, set real values in the project environment variables instead of relying on these local defaults.
+
+---
+
 ## Project Structure
 
 ```

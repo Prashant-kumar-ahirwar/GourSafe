@@ -1,6 +1,7 @@
 import os
 import functools
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, jsonify, g, session
@@ -25,6 +26,18 @@ app = Flask(__name__)
 # SECRET_KEY signs the login session cookie. In Vercel/Supabase production,
 # set a real random value in environment variables and never commit it.
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-insecure-key-change-me")
+
+# Keep students signed in. Without an expiry date the login cookie is a
+# "session cookie" that the Android app throws away every time it is closed,
+# which signed people out. A 30-day cookie survives closing the app.
+# (SECRET_KEY above must be the SAME value on every deploy, or everyone is
+# signed out whenever the server restarts.)
+app.config.update(
+    PERMANENT_SESSION_LIFETIME=timedelta(days=30),
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=bool(os.environ.get("VERCEL")),
+)
 
 # Operator login credentials. In production, set OPERATOR_USERNAME and
 # OPERATOR_PASSWORD_HASH as environment variables in Vercel (see README).
@@ -69,6 +82,18 @@ PUBLIC_ENDPOINTS = {
     "update_report_status", "update_alert_status", "admin_reports_redirect",
 }
 
+IST = ZoneInfo("Asia/Kolkata")
+
+
+@app.template_filter("ist")
+def format_ist(value):
+    # Show stored UTC times as Indian time, e.g. "04 Oct 2026, 07:45 PM"
+    if not value:
+        return ""
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(IST).strftime("%d %b %Y, %I:%M %p")
+
 
 def get_current_user():
     # Returns the logged-in user's row, or None if this is a guest session
@@ -92,6 +117,9 @@ def inject_current_user():
 @app.before_request
 def require_login_or_guest():
     endpoint = request.endpoint
+    # Remember student sign-ins (and guest choice) for 30 days
+    if session.get("user_id") or session.get("guest"):
+        session.permanent = True
     if endpoint is None or endpoint in PUBLIC_ENDPOINTS:
         return  # 404s, static files, and the auth pages themselves
 
@@ -243,6 +271,9 @@ def init_db():
         # Live-tracking columns (safe to run repeatedly)
         cursor.execute("ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS track_token TEXT")
         cursor.execute("ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ")
+        # Link reports / SOS alerts to the signed-in student so they can see them in "My Reports"
+        cursor.execute("ALTER TABLE public.reports ADD COLUMN IF NOT EXISTS user_id BIGINT")
+        cursor.execute("ALTER TABLE public.sos_alerts ADD COLUMN IF NOT EXISTS user_id BIGINT")
         db.commit()
     except Exception:
         db.rollback()
@@ -402,6 +433,27 @@ def profile():
     return render_template("profile.html", guest=True)
 
 
+@app.route("/my-reports")
+def my_reports():
+    # A signed-in student's own reports and SOS alerts, read-only.
+    # Statuses are changed only from the operator console (/operator).
+    if not session.get("user_id"):
+        return render_template("my_reports.html", guest=True)
+
+    db = get_db()
+    reports = db.execute(
+        "SELECT id, category, description, status, created_at FROM reports "
+        "WHERE user_id = ? ORDER BY created_at DESC LIMIT 100",
+        (session["user_id"],)
+    ).fetchall()
+    sos_alerts = db.execute(
+        "SELECT id, latitude, longitude, status, created_at, updated_at FROM sos_alerts "
+        "WHERE user_id = ? ORDER BY created_at DESC LIMIT 100",
+        (session["user_id"],)
+    ).fetchall()
+    return render_template("my_reports.html", reports=reports, sos_alerts=sos_alerts)
+
+
 @app.route("/settings")
 def settings():
     # Simple settings page for the profile menu. This keeps the main profile
@@ -545,9 +597,9 @@ def report():
 
         db = get_db()
         db.execute(
-            "INSERT INTO reports (anonymous, name, category, description, created_at) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (anonymous, name, category, description, datetime.now(timezone.utc))
+            "INSERT INTO reports (anonymous, name, category, description, created_at, user_id) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (anonymous, name, category, description, datetime.now(timezone.utc), session.get("user_id"))
         )
         db.commit()
         return render_template("report.html", success=True)
@@ -574,9 +626,9 @@ def api_sos():
 
     db = get_db()
     row = db.execute(
-        "INSERT INTO sos_alerts (latitude, longitude, accuracy, created_at, updated_at, track_token) "
-        "VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
-        (lat, lon, acc, now, now, token)
+        "INSERT INTO sos_alerts (latitude, longitude, accuracy, created_at, updated_at, track_token, user_id) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id",
+        (lat, lon, acc, now, now, token, session.get("user_id"))
     ).fetchone()
     db.commit()
     return jsonify({
@@ -650,10 +702,31 @@ def operator_dashboard():
     sos_alerts = db.execute("SELECT * FROM sos_alerts ORDER BY created_at DESC").fetchall()
     open_alerts = sum(1 for alert in sos_alerts if alert["status"] == "active")
     new_reports = sum(1 for item in reports if item["status"] == "new")
+
+    # Things that still need action come first; newest first inside each group
+    # (sort() is stable, and the rows already arrive newest first).
+    sos_alerts = sorted(sos_alerts, key=lambda a: 0 if a["status"] == "active" else 1)
+    report_rank = {"new": 0, "acknowledged": 1, "resolved": 2}
+    reports = sorted(reports, key=lambda r: report_rank.get(r["status"], 3))
+
+    # Plain data for the live map on the left of the dashboard
+    map_alerts = [
+        {
+            "id": a["id"],
+            "lat": a["latitude"],
+            "lng": a["longitude"],
+            "acc": a["accuracy"] or 0,
+            "status": a["status"],
+            "created": format_ist(a["created_at"]),
+            "updated": format_ist(a["updated_at"]) if a["updated_at"] else "",
+        }
+        for a in sos_alerts
+    ]
     return render_template(
         "operator_dashboard.html",
         reports=reports,
         sos_alerts=sos_alerts,
+        map_alerts=map_alerts,
         open_alerts=open_alerts,
         new_reports=new_reports,
     )

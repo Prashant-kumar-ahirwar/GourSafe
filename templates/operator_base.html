@@ -31,7 +31,8 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
   />
   <!-- Shared site styles (operator-specific rules are appended at the bottom) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=10" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=12" />
+  {% block head_extra %}{% endblock %}
 </head>
 <body class="operator-shell">
 
@@ -61,7 +62,7 @@
     </div>
   </nav>
 
-  <main class="container-fluid px-3 py-4 operator-main">
+  <main class="container-fluid px-3 py-4 operator-main {% block main_class %}{% endblock %}">
     {% block content %}{% endblock %}
   </main>
 

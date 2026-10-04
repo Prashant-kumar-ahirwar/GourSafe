@@ -34,7 +34,7 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
   />
   <!-- Custom styles (overrides only — Bootstrap handles the rest) -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=10" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=12" />
   {% block extra_styles %}{% endblock %}
 </head>
 <body>
@@ -145,6 +145,11 @@
             <li>
               <a class="dropdown-item" href="#" onclick="toggleTheme(); return false;">
                 <i class="bi bi-moon-stars-fill me-2" data-theme-icon></i><span data-theme-label>Dark Mode</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{{ url_for('my_reports') }}">
+                <i class="bi bi-clipboard2-pulse-fill me-2"></i>My Reports
               </a>
             </li>
             <li><hr class="dropdown-divider" /></li>
